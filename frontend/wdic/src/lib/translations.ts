@@ -68,6 +68,8 @@ export const translations: Record<string, Record<string, string>> = {
     blinds: "Blinds",
     hero: "Hero",
     board: "Board",
+    show_analysis: "Show Analysis",
+    hide_analysis: "Hide Analysis",
 
     // Session Detail
     back_to_dashboard: "Back to Dashboard",
@@ -163,6 +165,8 @@ export const translations: Record<string, Record<string, string>> = {
     blinds: "บลายด์",
     hero: "ฮีโร่",
     board: "บอร์ด",
+    show_analysis: "แสดงการวิเคราะห์",
+    hide_analysis: "ซ่อนการวิเคราะห์",
 
     // Session Detail
     back_to_dashboard: "กลับไปที่แดชบอร์ด",

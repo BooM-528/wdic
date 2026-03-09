@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown";
 import { getGuestId } from "@/lib/guest.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { motion, AnimatePresence } from "framer-motion";
 
 // --- Types ---
 interface WdicHandData {
@@ -142,6 +143,7 @@ export default function WdicSessionDetailPage() {
   const { language } = useLanguage();
   const [sessionAnalysis, setSessionAnalysis] = useState<any>(null);
   const [analyzingSession, setAnalyzingSession] = useState(false);
+  const [isAnalysisCollapsed, setIsAnalysisCollapsed] = useState(false);
 
   // Api Filter States
   const [apiPosition, setApiPosition] = useState<string>('');
@@ -408,10 +410,11 @@ export default function WdicSessionDetailPage() {
                     
                     <div className="w-full md:w-auto">
                       {sessionAnalysis ? (
+                        <div className="flex gap-2 w-full md:w-auto">
                           <button 
                               onClick={() => handleAnalyzeSession(true)}
                               disabled={analyzingSession}
-                              className={`w-full md:w-auto px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-3 group
+                              className={`flex-1 md:flex-none px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-3 group
                                   ${analyzingSession 
                                       ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
                                       : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900 active:scale-95 shadow-sm'
@@ -425,6 +428,19 @@ export default function WdicSessionDetailPage() {
                               )}
                               {analyzingSession ? t("updating") : t("re_analyze")}
                           </button>
+                          
+                          <button 
+                                onClick={() => setIsAnalysisCollapsed(!isAnalysisCollapsed)}
+                                className={`flex-1 md:flex-none px-6 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-2 shadow-sm
+                                    ${isAnalysisCollapsed 
+                                        ? 'bg-gray-900 text-white border-gray-900 hover:bg-gray-800' 
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900'
+                                    }`}
+                            >
+                                <svg className={`w-4 h-4 transition-transform duration-300 ${isAnalysisCollapsed ? 'rotate-180' : ''}`} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+                                {isAnalysisCollapsed ? t("show_analysis") : t("hide_analysis")}
+                            </button>
+                        </div>
                       ) : (
                           <button 
                               onClick={() => handleAnalyzeSession(false)}
@@ -459,29 +475,39 @@ export default function WdicSessionDetailPage() {
                     </div>
                 </div>
 
-                {sessionAnalysis && (
-                    <div className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed bg-white/60 p-8 md:p-12 rounded-[2.5rem] border border-white mt-12 shadow-[inset_0_2px_15px_rgba(0,0,0,0.01)] transition-all duration-700">
-                        <ReactMarkdown 
-                            components={{
-                                h1: ({node, ref, ...props}) => <h1 className="text-2xl font-black text-gray-900 mb-6 mt-8 first:mt-0 tracking-tight" {...props} />,
-                                h2: ({node, ref, ...props}) => <h2 className="text-xl font-black text-gray-900 mb-4 mt-8 first:mt-0 tracking-tight" {...props} />,
-                                h3: ({node, ref, ...props}) => <h3 className="text-lg font-black text-gray-900 mb-3 mt-6 first:mt-0 tracking-tight" {...props} />,
-                                p: ({node, ref, ...props}) => <p className="mb-4 last:mb-0" {...props} />,
-                                ul: ({node, ref, ...props}) => <ul className="list-none space-y-3 mb-6" {...props} />,
-                                li: ({node, ref, ...props}) => (
-                                    <li className="flex gap-3 items-start group/li" {...props}>
-                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D9114A] flex-shrink-0 group-hover/li:scale-125 transition-transform"></span>
-                                        <span>{props.children}</span>
-                                    </li>
-                                ),
-                                strong: ({node, ref, ...props}) => <strong className="font-black text-gray-900" {...props} />,
-                                blockquote: ({node, ref, ...props}) => <blockquote className="border-l-4 border-[#D9114A] pl-6 py-2 my-6 italic text-gray-600 bg-rose-50/30 rounded-r-2xl" {...props} />,
-                            }}
-                        >
-                            {sessionAnalysis.content}
-                        </ReactMarkdown>
-                    </div>
-                )}
+                <AnimatePresence>
+                  {sessionAnalysis && !isAnalysisCollapsed && (
+                      <motion.div 
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.4, ease: [0.04, 0.62, 0.23, 0.98] }}
+                          className="overflow-hidden"
+                      >
+                          <div className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed bg-white/60 p-8 md:p-12 rounded-[2.5rem] border border-white mt-12 shadow-[inset_0_2px_15px_rgba(0,0,0,0.01)] transition-all duration-700">
+                              <ReactMarkdown 
+                                  components={{
+                                      h1: ({node, ref, ...props}: any) => <h1 className="text-2xl font-black text-gray-900 mb-6 mt-8 first:mt-0 tracking-tight" {...props} />,
+                                      h2: ({node, ref, ...props}: any) => <h2 className="text-xl font-black text-gray-900 mb-4 mt-8 first:mt-0 tracking-tight" {...props} />,
+                                      h3: ({node, ref, ...props}: any) => <h3 className="text-lg font-black text-gray-900 mb-3 mt-6 first:mt-0 tracking-tight" {...props} />,
+                                      p: ({node, ref, ...props}: any) => <p className="mb-4 last:mb-0" {...props} />,
+                                      ul: ({node, ref, ...props}: any) => <ul className="list-none space-y-3 mb-6" {...props} />,
+                                      li: ({node, ref, ...props}: any) => (
+                                          <li className="flex gap-3 items-start group/li" {...props}>
+                                              <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D9114A] flex-shrink-0 group-hover/li:scale-125 transition-transform"></span>
+                                              <span>{props.children}</span>
+                                          </li>
+                                      ),
+                                      strong: ({node, ref, ...props}: any) => <strong className="font-black text-gray-900" {...props} />,
+                                      blockquote: ({node, ref, ...props}: any) => <blockquote className="border-l-4 border-[#D9114A] pl-6 py-2 my-6 italic text-gray-600 bg-rose-50/30 rounded-r-2xl" {...props} />,
+                                  }}
+                              >
+                                  {sessionAnalysis.content}
+                              </ReactMarkdown>
+                          </div>
+                      </motion.div>
+                  )}
+                </AnimatePresence>
             </div>
         </div>
 
