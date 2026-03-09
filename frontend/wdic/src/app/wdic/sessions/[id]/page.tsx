@@ -232,7 +232,7 @@ export default function WdicSessionDetailPage() {
         <div className="fixed bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto p-4 md:p-10">
+      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-10">
         
         {/* Navigation */}
         <div className="flex items-center justify-between mb-8">

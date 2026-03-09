@@ -54,7 +54,7 @@ export default function HomePage() {
       </div>
 
       {/* Navbar Container */}
-      <nav className="relative z-20 w-full max-w-6xl mx-auto px-6 py-6 flex items-center justify-between">
+      <nav className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
             W
@@ -81,7 +81,7 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 w-full max-w-6xl mx-auto px-6 pt-20 pb-32 text-center flex flex-col items-center">
+      <section className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-20 pb-32 text-center flex flex-col items-center">
         <div className="inline-block px-4 py-1.5 rounded-full bg-white border border-rose-100 text-[#D9114A] text-xs font-black uppercase tracking-widest mb-8 shadow-sm">
           Poker Analytics Platform ♠️♥️
         </div>
@@ -109,7 +109,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Grid */}
-      <section className="relative z-10 w-full max-w-6xl mx-auto px-6 py-20 border-t border-gray-200/50">
+      <section className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 border-t border-gray-200/50">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">ฟีเจอร์หลักที่จะเปลี่ยนวิธีการเล่นของคุณ</h2>
           <p className="text-gray-500 font-medium">แอปพลิเคชันของเราออกแบบมาเพื่อผู้เล่นที่ต้องการพัฒนาตัวเองอย่างจริงจัง</p>
@@ -138,7 +138,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works */}
-      <section className="relative z-10 w-full max-w-5xl mx-auto px-6 py-20">
+      <section className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20">
         <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] border border-white p-10 md:p-16 shadow-[0_20px_60px_rgba(0,0,0,0.05)] text-center">
           <h2 className="text-3xl font-black text-gray-900 mb-12">ขั้นตอนการใช้งาน</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
@@ -159,7 +159,7 @@ export default function HomePage() {
       </section>
 
       <footer className="relative z-10 w-full border-t border-gray-200/60 mt-auto bg-white/50 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-gray-900 font-bold">
             <div className="w-6 h-6 bg-[#D9114A] rounded text-white flex items-center justify-center text-xs">W</div>
             WHY DID I CALL

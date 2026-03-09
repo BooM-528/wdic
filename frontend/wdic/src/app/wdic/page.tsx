@@ -77,7 +77,7 @@ export default function WdicSessionsPage() {
         <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 max-w-6xl mx-auto p-6 md:p-12">
+      <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-12">
         
         {/* Navbar / Top Bar */}
         <div className="flex items-center justify-between mb-8">
