@@ -13,6 +13,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   libpq-dev \
+  curl \
   && rm -rf /var/lib/apt/lists/*
 
 # ติดตั้ง Python dependencies ล่วงหน้า (ถ้ามี requirements.txt)
