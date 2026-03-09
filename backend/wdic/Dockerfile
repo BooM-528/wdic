@@ -27,6 +27,6 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Set the command to run the development server
-CMD gunicorn hangkan.wsgi:application --bind 0.0.0.0:8000
+CMD gunicorn wdic.wsgi:application --bind 0.0.0.0:8000
 
 EXPOSE 8000

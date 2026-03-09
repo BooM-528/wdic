@@ -14,13 +14,13 @@ services:
     build: .
     volumes:
       - .:/app
-      - static_volume:/home/boomjha/pookmitr/hangkan-backend/hangkan/staticfiles
+      - static_volume:/home/boomjha/pookmitr/wdic-backend/wdic/staticfiles
     ports:
       - 8080:8000
     restart: always
     image: pookmitr:1.0_demo
     container_name: pookmitr_container
-    command: gunicorn hangkan.wsgi:application --bind 0.0.0.0:8000
+    command: gunicorn wdic.wsgi:application --bind 0.0.0.0:8000
 
     depends_on:
       - db
@@ -37,5 +37,5 @@ volumes:
     driver_opts:
       o: bind  # Mount type (default is bind)
       type: none  # Optional volume type (default is none)
-      device: /home/boomjha/pookmitr/hangkan-backend/hangkan/staticfiles
+      device: /home/boomjha/pookmitr/wdic-backend/wdic/staticfiles
 
