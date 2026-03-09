@@ -1,0 +1,23 @@
+# Core Django
+Django>=6.0,<7.0           # Django 6.x, สดใหม่ ใช้ฟีเจอร์ล่าสุด
+Pillow>=12.0.0, <13.0
+
+# REST API
+djangorestframework>=3.16,<4.0  # สำหรับสร้าง API
+
+# Database (ถ้าใช้ PostgreSQL)
+psycopg2-binary>=2.9,<3.0
+
+# Authentication & JWT
+djangorestframework-simplejwt>=5.0,<6.0  # สำหรับ token-based auth
+
+# CORS (เชื่อม frontend Next.js)
+django-cors-headers>=4.0,<5.0
+
+# Background tasks (optional)
+celery>=5.5,<6.0          # ถ้าต้องการ task queue
+redis>=5.0,<6.0           # สำหรับ Celery broker / cache
+
+# Environment variables
+python-dotenv>=1.0,<2.0   # จัดการ .env
+gunicorn>=23.0,<24.0

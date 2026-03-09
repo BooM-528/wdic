@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  app:
+    build: .
+    volumes:
+      - .:/app
+      - static_volume:/home/boomjha/pookmitr/hangkan-backend/hangkan/staticfiles
+    ports:
+      - 8080:8000
+    restart: always
+    image: pookmitr:1.0_demo
+    container_name: pookmitr_container
+    command: gunicorn hangkan.wsgi:application --bind 0.0.0.0:8000
+
+    depends_on:
+      - db
+
+volumes:
+  pgdata:
+    driver: local  # Optional driver specification (default is local)
+    driver_opts:
+      o: bind  # Mount type (default is bind)
+      type: none  # Optional volume type (default is none)
+      device: /data/pookmitr
+  static_volume:
+    driver: local  # Optional driver specification (default is local)
+    driver_opts:
+      o: bind  # Mount type (default is bind)
+      type: none  # Optional volume type (default is none)
+      device: /home/boomjha/pookmitr/hangkan-backend/hangkan/staticfiles
+
