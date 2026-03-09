@@ -82,6 +82,7 @@ function PositionBadge({ pos }: { pos?: string | null }) {
   
   const colors: Record<string, string> = {
     BTN: "bg-emerald-50 text-emerald-600 border-emerald-200/50",
+    "BTN/SB": "bg-emerald-50 text-emerald-600 border-emerald-200/50",
     CO:  "bg-teal-50 text-teal-600 border-teal-200/50",
     HJ:  "bg-amber-50 text-amber-600 border-amber-200/50",
     MP:  "bg-orange-50 text-orange-600 border-orange-200/50",
@@ -268,7 +269,7 @@ export default function WdicSessionDetailPage() {
 
 
   if (error) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-[#D9114A] font-black tracking-widest text-xl">{error}</div>;
-  if (!data || loading) return (
+  if (!data) return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FA]">
           <div className="relative w-20 h-20">
               <div className="absolute inset-0 rounded-full border-4 border-gray-100"></div>
@@ -321,77 +322,30 @@ export default function WdicSessionDetailPage() {
             
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-rose-100 to-rose-50 rounded-full blur-3xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
 
-            <div className="relative z-10 flex flex-col lg:flex-row justify-between items-start gap-10">
-                
-                {/* Left: Info */}
-                <div className="flex-1 w-full flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-4">
-                        <span className="text-[10px] text-[#D9114A] font-black uppercase tracking-widest bg-rose-50/50 px-3 py-1.5 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">
-                            {formatDate(session.started_at || session.created_at)}
-                        </span>
-                    </div>
-                    <h1 className="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-800 to-gray-600 tracking-tighter leading-tight mb-8">
-                        {session.name || t("poker_session")}
-                    </h1>
-                    
-                    {/* Tags */}
-                    <div className="flex gap-3">
-                        <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white shadow-sm">
-                            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:block">{t("hands_played")}</span>
-                            <span className="text-sm font-black text-gray-900">{session.handCount}</span>
-                        </div>
-                        {/* Duration */}
-                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white bg-white/80 backdrop-blur-md shadow-sm">
-                            <ClockIcon />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 hidden sm:block">{t("duration")}</span>
-                            <span className="text-sm font-black text-gray-700">
-                                {durationStr.replace('h', t('hour_short')).replace('m', t('minute_short'))}
-                            </span>
-                        </div>
-                    </div>
+            <div className="relative z-10 flex flex-col justify-center">
+                <div className="flex items-center gap-3 mb-4">
+                    <span className="text-[10px] text-[#D9114A] font-black uppercase tracking-widest bg-rose-50/50 px-3 py-1.5 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">
+                        {formatDate(session.started_at || session.created_at)}
+                    </span>
                 </div>
-
-                {/* Right: Stats Grid */}
-                <div className="grid grid-cols-2 gap-3 md:gap-4 w-full lg:w-auto min-w-0 md:min-w-[320px]">
-                    <Link href={maxWinHandId ? `/wdic/hands/${maxWinHandId}` : "#"} className={`bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100/50 hover:border-green-300 hover:shadow-lg hover:-translate-y-1 p-5 rounded-3xl transition-all group/card ${!maxWinHandId && "pointer-events-none opacity-50"}`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-green-700 font-bold uppercase tracking-widest">{t("biggest_win")}</span>
-                            <TrophyIcon />
-                        </div>
-                        <div className="text-xl md:text-2xl font-black text-green-700 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
-                            +{maxWin.toLocaleString()}
-                        </div>
-                    </Link>
-
-                    <Link href={maxLossHandId ? `/wdic/hands/${maxLossHandId}` : "#"} className={`bg-gradient-to-br from-red-50 to-orange-50/50 border border-red-100/50 hover:border-red-300 hover:shadow-lg hover:-translate-y-1 p-5 rounded-3xl transition-all group/card ${!maxLossHandId && "pointer-events-none opacity-50"}`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-red-700 font-bold uppercase tracking-widest">{t("biggest_loss")}</span>
-                            <TrendingDownIcon />
-                        </div>
-                        <div className="text-xl md:text-2xl font-black text-red-600 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
-                            {maxLoss === 0 ? "0" : maxLoss.toLocaleString()}
-                        </div>
-                    </Link>
-
-                    <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50 p-5 rounded-3xl shadow-sm">
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-blue-700 font-bold uppercase tracking-widest">{t("total_won")}</span>
-                            <CoinsIcon />
-                        </div>
-                        <div className="text-xl md:text-2xl font-black text-blue-700 tracking-tighter drop-shadow-sm">
-                            +{grossProfit.toLocaleString()}
-                        </div>
+                <h1 className="text-2xl md:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-800 to-gray-600 tracking-tighter leading-tight mb-8 break-words">
+                    {session.name || t("poker_session")}
+                </h1>
+                
+                {/* Tags */}
+                <div className="flex gap-3">
+                    <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white shadow-sm">
+                        <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+                        <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:block">{t("hands_played")}</span>
+                        <span className="text-sm font-black text-gray-900">{session.handCount}</span>
                     </div>
-
-                    <div className={`p-5 rounded-3xl border shadow-sm ${totalProfit >= 0 ? 'bg-white/80 border-white' : 'bg-white/80 border-white'}`}>
-                        <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t("net_result")}</span>
-                            <ChartIcon />
-                        </div>
-                        <div className={`text-lg md:text-2xl font-black tracking-tighter drop-shadow-sm ${totalProfit >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
-                            {totalProfit > 0 ? "+" : ""}{totalProfit.toLocaleString()}
-                        </div>
+                    {/* Duration */}
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white bg-white/80 backdrop-blur-md shadow-sm">
+                        <ClockIcon />
+                        <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 hidden sm:block">{t("duration")}</span>
+                        <span className="text-sm font-black text-gray-700">
+                            {durationStr.replace('h', t('hour_short')).replace('m', t('minute_short'))}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -405,7 +359,7 @@ export default function WdicSessionDetailPage() {
             <div className="bg-gradient-to-r from-gray-50/50 via-white to-gray-50/50 rounded-[2.3rem] p-8 md:p-12 relative z-10">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
                     <div className="flex items-center gap-6">
-                        <div className="w-16 h-16 rounded-[1.5rem] bg-gray-900 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,0,0,0.2)] rotate-3">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-[#D9114A] to-rose-400 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(217,17,74,0.25)] rotate-3">
                             <svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
                         </div>
                         <div>
@@ -521,6 +475,49 @@ export default function WdicSessionDetailPage() {
             </div>
         </div>
 
+        {/* Session Summary Stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-10 w-full mt-4">
+            <Link href={maxWinHandId ? `/wdic/hands/${maxWinHandId}` : "#"} className={`bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100/50 hover:border-green-300 hover:shadow-lg hover:-translate-y-1 p-5 md:p-6 rounded-[2rem] transition-all group/card ${!maxWinHandId && "pointer-events-none opacity-50"}`}>
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-[10px] md:text-xs text-green-700 font-bold uppercase tracking-widest">{t("biggest_win")}</span>
+                    <TrophyIcon />
+                </div>
+                <div className="text-2xl md:text-3xl font-black text-green-700 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
+                    +{maxWin.toLocaleString()}
+                </div>
+            </Link>
+
+            <Link href={maxLossHandId ? `/wdic/hands/${maxLossHandId}` : "#"} className={`bg-gradient-to-br from-red-50 to-orange-50/50 border border-red-100/50 hover:border-red-300 hover:shadow-lg hover:-translate-y-1 p-5 md:p-6 rounded-[2rem] transition-all group/card ${!maxLossHandId && "pointer-events-none opacity-50"}`}>
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-[10px] md:text-xs text-red-700 font-bold uppercase tracking-widest">{t("biggest_loss")}</span>
+                    <TrendingDownIcon />
+                </div>
+                <div className="text-2xl md:text-3xl font-black text-red-600 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
+                    {maxLoss === 0 ? "0" : maxLoss.toLocaleString()}
+                </div>
+            </Link>
+
+            <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50 p-5 md:p-6 rounded-[2rem] shadow-sm">
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-[10px] md:text-xs text-blue-700 font-bold uppercase tracking-widest">{t("total_won")}</span>
+                    <CoinsIcon />
+                </div>
+                <div className="text-2xl md:text-3xl font-black text-blue-700 tracking-tighter drop-shadow-sm">
+                    +{grossProfit.toLocaleString()}
+                </div>
+            </div>
+
+            <div className={`p-5 md:p-6 rounded-[2rem] border shadow-sm ${totalProfit >= 0 ? 'bg-white/80 border-white' : 'bg-white/80 border-white'}`}>
+                <div className="flex justify-between items-start mb-4">
+                    <span className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-widest">{t("net_result")}</span>
+                    <ChartIcon />
+                </div>
+                <div className={`text-2xl md:text-3xl font-black tracking-tighter drop-shadow-sm ${totalProfit >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
+                    {totalProfit > 0 ? "+" : ""}{totalProfit.toLocaleString()}
+                </div>
+            </div>
+        </div>
+
         {/* Filter Bar */}
         <div className="sticky top-4 z-30 mb-6 bg-white/70 backdrop-blur-xl border border-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl p-2.5">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
@@ -537,13 +534,17 @@ export default function WdicSessionDetailPage() {
                             onChange={e => setApiPosition(e.target.value)}
                             className="bg-white border border-gray-200 text-[10px] font-black uppercase tracking-wider text-gray-600 rounded-xl px-3 py-2.5 outline-none shadow-sm cursor-pointer hover:border-gray-300 transition-colors"
                         >
-                            <option value="">Pos: All</option>
+                            <option value="">{t("filter_pos_all")}</option>
                             <option value="BTN">BTN</option>
                             <option value="SB">SB</option>
                             <option value="BB">BB</option>
                             <option value="UTG">UTG</option>
+                            <option value="UTG+1">UTG+1</option>
+                            <option value="UTG+2">UTG+2</option>
+                            <option value="MP">MP</option>
                             <option value="HJ">HJ</option>
                             <option value="CO">CO</option>
+                            <option value="BTN/SB">BTN/SB</option>
                         </select>
 
                         <select
@@ -551,9 +552,9 @@ export default function WdicSessionDetailPage() {
                             onChange={e => setApiStatus(e.target.value)}
                             className="bg-white border border-gray-200 text-[10px] font-black uppercase tracking-wider text-gray-600 rounded-xl px-3 py-2.5 outline-none shadow-sm cursor-pointer hover:border-gray-300 transition-colors"
                         >
-                            <option value="">Status: All</option>
-                            <option value="analyzed">Analyzed</option>
-                            <option value="unanalyzed">Unanalyzed</option>
+                            <option value="">{t("filter_status_all")}</option>
+                            <option value="analyzed">{t("filter_analyzed")}</option>
+                            <option value="unanalyzed">{t("filter_unanalyzed")}</option>
                         </select>
 
                         <button 
@@ -565,7 +566,7 @@ export default function WdicSessionDetailPage() {
                             }`}
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill={apiRecommended ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                            <span className="hidden sm:inline">Recommended</span>
+                            <span className="hidden sm:inline">{t("filter_recommended")}</span>
                         </button>
                     </div>
 
@@ -606,7 +607,7 @@ export default function WdicSessionDetailPage() {
         </div>
 
         {/* Hands List */}
-        <div className="space-y-4">
+        <div className={`space-y-4 transition-opacity duration-300 ${loading ? 'opacity-50 pointer-events-none' : ''}`}>
           {filteredHands.map((h) => {
              const originalIdx = hands.findIndex(orig => orig.id === h.id);
              const handNumber = session.handCount - originalIdx;

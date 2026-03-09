@@ -13,8 +13,8 @@ interface HandsFilter {
 
 export async function getSessionHands(sessionId: string, limit = 200, filters?: HandsFilter): Promise<WdicSessionHandsResponse> {
   let url = `/wdic/sessions/${sessionId}/hands?limit=${limit}`;
-  if (filters?.position) url += `&position=${filters.position}`;
-  if (filters?.status) url += `&status=${filters.status}`;
+  if (filters?.position) url += `&position=${encodeURIComponent(filters.position)}`;
+  if (filters?.status) url += `&status=${encodeURIComponent(filters.status)}`;
   if (filters?.recommended) url += `&recommended=true`;
   return apiFetch<WdicSessionHandsResponse>(url, { method: "GET" });
 }

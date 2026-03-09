@@ -1,15 +1,27 @@
 type PosMap = Record<string, string>;
 
-const POS_9 = ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "LJ", "HJ", "CO"];
-const POS_8 = ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"];
-const POS_6 = ["BTN", "SB", "BB", "UTG", "MP", "CO"];
+const POSITIONS_MAP: Record<number, string[]> = {
+  2: ["BTN/SB", "BB"],
+  3: ["BTN", "SB", "BB"],
+  4: ["BTN", "SB", "BB", "CO"],
+  5: ["BTN", "SB", "BB", "UTG", "CO"],
+  6: ["BTN", "SB", "BB", "UTG", "MP", "CO"],
+  7: ["BTN", "SB", "BB", "UTG", "MP", "HJ", "CO"],
+  8: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"],
+  9: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO"],
+  10: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "UTG+3", "MP", "HJ", "CO"],
+};
 
 function getPosNames(n: number) {
-  if (n <= 2) return ["BTN/SB", "BB"];
-  if (n <= 6) return POS_6.slice(0, n);
-  if (n === 8) return POS_8;
-  if (n >= 9) return POS_9.slice(0, Math.min(n, 9));
-  return POS_8.slice(0, n);
+  if (POSITIONS_MAP[n]) return POSITIONS_MAP[n];
+  if (n <= 2) return POSITIONS_MAP[2];
+  
+  // fallback for large n
+  const map = [...POSITIONS_MAP[10]];
+  while (map.length < n) {
+      map.splice(3, 0, `UTG+${map.length - 6}`);
+  }
+  return map;
 }
 
 export function buildPlayerPositionMap(rawText: string): PosMap {

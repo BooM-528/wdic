@@ -96,7 +96,12 @@ export const translations: Record<string, Record<string, string>> = {
     no_hands_found_desc: "Try adjusting your filters to see more results.",
     session_ai_insights: "Session AI Insights",
     session_ai_insights_desc: "Discover big leaks and overall performance",
-    analyze_full_session: "Analyze Full Session"
+    analyze_full_session: "Analyze Full Session",
+    filter_pos_all: "Pos: All",
+    filter_status_all: "Status: All",
+    filter_analyzed: "Analyzed",
+    filter_unanalyzed: "Unanalyzed",
+    filter_recommended: "Recommended"
   },
   th: {
     // Navbar / Common
@@ -195,6 +200,11 @@ export const translations: Record<string, Record<string, string>> = {
     no_hands_found_desc: "ลองปรับฟิลเตอร์เพื่อดูผลลัพธ์อื่น",
     session_ai_insights: "การวิเคราะห์ภาพรวมโดย AI",
     session_ai_insights_desc: "ค้นหาจุดบกพร่องและสรุปผลการเล่นทั้งเซสชั่น",
-    analyze_full_session: "วิเคราะห์ทั้งเซสชั่น"
+    analyze_full_session: "วิเคราะห์ทั้งเซสชั่น",
+    filter_pos_all: "ตำแหน่ง: ทั้งหมด",
+    filter_status_all: "สถานะ: ทั้งหมด",
+    filter_analyzed: "วิเคราะห์แล้ว",
+    filter_unanalyzed: "ยังไม่วิเคราะห์",
+    filter_recommended: "แนะนำ"
   }
 };

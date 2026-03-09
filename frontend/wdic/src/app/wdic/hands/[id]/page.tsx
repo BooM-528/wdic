@@ -57,19 +57,32 @@ function parseTableRoster(rawText: string | undefined, totalPlayers: number, btn
     const btnIndex = sortedPlayers.findIndex(p => p.seat === btnSeat);
 
     const count = sortedPlayers.length;
+    
+    const POSITIONS_MAP: Record<number, string[]> = {
+      2: ["BTN/SB", "BB"],
+      3: ["BTN", "SB", "BB"],
+      4: ["BTN", "SB", "BB", "CO"],
+      5: ["BTN", "SB", "BB", "UTG", "CO"],
+      6: ["BTN", "SB", "BB", "UTG", "MP", "CO"],
+      7: ["BTN", "SB", "BB", "UTG", "MP", "HJ", "CO"],
+      8: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"],
+      9: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO"],
+      10: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "UTG+3", "MP", "HJ", "CO"],
+    };
+
     return sortedPlayers.map((p, idx) => {
         let pos = "UNK";
         if (btnIndex !== -1) {
             const rel = (idx - btnIndex + count) % count;
-            if (count === 2) pos = rel === 0 ? "BTN/SB" : "BB";
-            else {
-                if (rel === 0) pos = "BTN";
-                else if (rel === 1) pos = "SB";
-                else if (rel === 2) pos = "BB";
-                else if (rel === count - 1) pos = "CO";
-                else if (rel === count - 2) pos = "HJ";
-                else if (rel === count - 3) pos = "MP";
-                else pos = "UTG";
+            
+            if (POSITIONS_MAP[count]) {
+                pos = POSITIONS_MAP[count][rel];
+            } else if (count > 10) {
+                 const map = [...POSITIONS_MAP[10]];
+                 while (map.length < count) {
+                     map.splice(3, 0, `UTG+${map.length - 6}`);
+                 }
+                 pos = map[rel];
             }
         }
         return { ...p, pos };
@@ -127,6 +140,7 @@ function PositionBadge({ pos }: { pos?: string | null }) {
 
     const colors: Record<string, string> = {
         BTN: "bg-emerald-50 text-emerald-600 border-emerald-200/50",
+        "BTN/SB": "bg-emerald-50 text-emerald-600 border-emerald-200/50",
         CO: "bg-teal-50 text-teal-600 border-teal-200/50",
         HJ: "bg-amber-50 text-amber-600 border-amber-200/50",
         MP: "bg-orange-50 text-orange-600 border-orange-200/50",
@@ -610,7 +624,7 @@ export default function HandDetailPage() {
 
                             <div className="bg-gradient-to-r from-[#D9114A]/5 to-blue-50/50 px-8 py-7 border-b border-white flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
                                 <div className="flex items-center gap-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center text-white shadow-[0_10px_25px_rgba(0,0,0,0.1)] rotate-3">
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#D9114A] to-rose-400 flex items-center justify-center text-white shadow-[0_10px_25px_rgba(217,17,74,0.25)] rotate-3">
                                         <svg className="w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" /></svg>
                                     </div>
                                     <div>

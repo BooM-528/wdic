@@ -63,15 +63,28 @@ def determine_position(hero_seat: int, btn_seat: int, occupied_seats: List[int])
     num_players = len(sorted_seats)
     steps = (hero_idx - btn_idx) % num_players
 
-    if num_players == 2:
-        return "BTN/SB" if steps == 0 else "BB"
+    POSITIONS_MAP = {
+        2: ["BTN/SB", "BB"],
+        3: ["BTN", "SB", "BB"],
+        4: ["BTN", "SB", "BB", "CO"],
+        5: ["BTN", "SB", "BB", "UTG", "CO"],
+        6: ["BTN", "SB", "BB", "UTG", "MP", "CO"],
+        7: ["BTN", "SB", "BB", "UTG", "MP", "HJ", "CO"],
+        8: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"],
+        9: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO"],
+        10: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "UTG+3", "MP", "HJ", "CO"],
+    }
+
+    if num_players in POSITIONS_MAP:
+        return POSITIONS_MAP[num_players][steps]
+    
+    # Fallback for > 10 players
     if steps == 0: return "BTN"
     if steps == 1: return "SB"
     if steps == 2: return "BB"
     if steps == num_players - 1: return "CO"
     if steps == num_players - 2: return "HJ"
     if steps == num_players - 3: return "MP"
-    
     return "UTG" + (f"+{steps-3}" if steps > 3 else "")
 
 def split_hands(raw_file_text: str) -> List[str]:
