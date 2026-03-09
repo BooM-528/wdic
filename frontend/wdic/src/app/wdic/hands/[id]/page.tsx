@@ -57,32 +57,32 @@ function parseTableRoster(rawText: string | undefined, totalPlayers: number, btn
     const btnIndex = sortedPlayers.findIndex(p => p.seat === btnSeat);
 
     const count = sortedPlayers.length;
-    
+
     const POSITIONS_MAP: Record<number, string[]> = {
-      2: ["BTN/SB", "BB"],
-      3: ["BTN", "SB", "BB"],
-      4: ["BTN", "SB", "BB", "CO"],
-      5: ["BTN", "SB", "BB", "UTG", "CO"],
-      6: ["BTN", "SB", "BB", "UTG", "MP", "CO"],
-      7: ["BTN", "SB", "BB", "UTG", "MP", "HJ", "CO"],
-      8: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"],
-      9: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO"],
-      10: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "UTG+3", "MP", "HJ", "CO"],
+        2: ["BTN/SB", "BB"],
+        3: ["BTN", "SB", "BB"],
+        4: ["BTN", "SB", "BB", "CO"],
+        5: ["BTN", "SB", "BB", "UTG", "CO"],
+        6: ["BTN", "SB", "BB", "UTG", "MP", "CO"],
+        7: ["BTN", "SB", "BB", "UTG", "MP", "HJ", "CO"],
+        8: ["BTN", "SB", "BB", "UTG", "UTG+1", "MP", "HJ", "CO"],
+        9: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "MP", "HJ", "CO"],
+        10: ["BTN", "SB", "BB", "UTG", "UTG+1", "UTG+2", "UTG+3", "MP", "HJ", "CO"],
     };
 
     return sortedPlayers.map((p, idx) => {
         let pos = "UNK";
         if (btnIndex !== -1) {
             const rel = (idx - btnIndex + count) % count;
-            
+
             if (POSITIONS_MAP[count]) {
                 pos = POSITIONS_MAP[count][rel];
             } else if (count > 10) {
-                 const map = [...POSITIONS_MAP[10]];
-                 while (map.length < count) {
-                     map.splice(3, 0, `UTG+${map.length - 6}`);
-                 }
-                 pos = map[rel];
+                const map = [...POSITIONS_MAP[10]];
+                while (map.length < count) {
+                    map.splice(3, 0, `UTG+${map.length - 6}`);
+                }
+                pos = map[rel];
             }
         }
         return { ...p, pos };
@@ -310,11 +310,11 @@ function PokerTable({ roster, heroName, board, pot, winners, bb, shownCards }: a
                 const myCards = shownCards[player.name];
 
                 return (
-                    <div key={player.seat} className={`absolute ${posClass} flex flex-col items-center transition-all duration-500 z-30 w-[85px] md:w-[100px]`}>
+                    <div key={player.seat} className={`absolute ${posClass} flex flex-col items-center transition-all duration-500 ${isWinner ? 'z-[60]' : isHero ? 'z-[50]' : 'z-30'} w-[85px] md:w-[100px]`}>
 
                         {/* WIN Bubble: Higher up */}
                         {isWinner && (
-                            <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border-2 border-white whitespace-nowrap z-[60]">
+                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 animate-bounce bg-yellow-400 text-yellow-900 text-[10px] font-black px-2 py-0.5 rounded-full shadow-lg border-2 border-white whitespace-nowrap z-[100]">
                                 WIN!
                             </div>
                         )}
@@ -548,7 +548,7 @@ export default function HandDetailPage() {
 
                     <div className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
                         <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-                          W
+                            W
                         </div>
                         <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
                     </div>
