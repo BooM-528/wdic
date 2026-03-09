@@ -5,8 +5,18 @@ export async function listSessions(limit = 50): Promise<WdicSession[]> {
   return apiFetch<WdicSession[]>(`/wdic/sessions?limit=${limit}`, { method: "GET" });
 }
 
-export async function getSessionHands(sessionId: string, limit = 200): Promise<WdicSessionHandsResponse> {
-  return apiFetch<WdicSessionHandsResponse>(`/wdic/sessions/${sessionId}/hands?limit=${limit}`, { method: "GET" });
+interface HandsFilter {
+  position?: string;
+  status?: string;
+  recommended?: boolean;
+}
+
+export async function getSessionHands(sessionId: string, limit = 200, filters?: HandsFilter): Promise<WdicSessionHandsResponse> {
+  let url = `/wdic/sessions/${sessionId}/hands?limit=${limit}`;
+  if (filters?.position) url += `&position=${filters.position}`;
+  if (filters?.status) url += `&status=${filters.status}`;
+  if (filters?.recommended) url += `&recommended=true`;
+  return apiFetch<WdicSessionHandsResponse>(url, { method: "GET" });
 }
 
 export async function getHandDetail(handId: string): Promise<WdicHandDetail> {

@@ -21,6 +21,8 @@ interface WdicHandData {
   hero_invested: number | string;
   ante?: number | string;
   bb_value?: number | string;
+  has_analysis?: boolean;
+  is_recommended?: boolean;
 }
 
 interface WdicSessionData {
@@ -135,15 +137,25 @@ export default function WdicSessionDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Filter States
+  // Api Filter States
+  const [apiPosition, setApiPosition] = useState<string>('');
+  const [apiStatus, setApiStatus] = useState<string>('');
+  const [apiRecommended, setApiRecommended] = useState<boolean>(false);
+
+  // Local Filter States
   const [filterType, setFilterType] = useState<'all' | 'won' | 'lost'>('all');
   const [hideFolds, setHideFolds] = useState(false);
 
   useEffect(() => {
     async function load() {
+      setLoading(true);
       try {
         getGuestId();
-        const res = await getSessionHands(sessionId, 10000); 
+        const res = await getSessionHands(sessionId, 10000, {
+          position: apiPosition,
+          status: apiStatus,
+          recommended: apiRecommended
+        }); 
         setData(res as unknown as PageData);
       } catch (err: any) {
         console.error(err);
@@ -153,7 +165,7 @@ export default function WdicSessionDetailPage() {
       }
     }
     void load();
-  }, [sessionId]);
+  }, [sessionId, apiPosition, apiStatus, apiRecommended]);
 
   const { session, hands } = data || { session: {} as any, hands: [] };
 
@@ -344,18 +356,61 @@ export default function WdicSessionDetailPage() {
 
         {/* Filter Bar */}
         <div className="sticky top-4 z-30 mb-6 bg-white/70 backdrop-blur-xl border border-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl p-2.5">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div className="flex items-center gap-3 px-2 hidden md:flex">
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+                <div className="flex items-center gap-3 px-2 hidden lg:flex">
                     <span className="w-1.5 h-6 bg-[#D9114A] rounded-full"></span>
                     <h2 className="text-sm font-black text-gray-800 uppercase tracking-widest">{t("hand_history")}</h2>
                 </div>
-                <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
+                <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto pb-1 md:pb-0">
+                    
+                    {/* Advanced Filters */}
+                    <div className="flex items-center gap-2">
+                        <select 
+                            value={apiPosition} 
+                            onChange={e => setApiPosition(e.target.value)}
+                            className="bg-white border border-gray-200 text-[10px] font-black uppercase tracking-wider text-gray-600 rounded-xl px-3 py-2.5 outline-none shadow-sm cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                            <option value="">Pos: All</option>
+                            <option value="BTN">BTN</option>
+                            <option value="SB">SB</option>
+                            <option value="BB">BB</option>
+                            <option value="UTG">UTG</option>
+                            <option value="HJ">HJ</option>
+                            <option value="CO">CO</option>
+                        </select>
+
+                        <select
+                            value={apiStatus}
+                            onChange={e => setApiStatus(e.target.value)}
+                            className="bg-white border border-gray-200 text-[10px] font-black uppercase tracking-wider text-gray-600 rounded-xl px-3 py-2.5 outline-none shadow-sm cursor-pointer hover:border-gray-300 transition-colors"
+                        >
+                            <option value="">Status: All</option>
+                            <option value="analyzed">Analyzed</option>
+                            <option value="unanalyzed">Unanalyzed</option>
+                        </select>
+
+                        <button 
+                            onClick={() => setApiRecommended(!apiRecommended)}
+                            className={`flex items-center gap-1.5 px-3 py-2.5 rounded-xl border text-[10px] font-black uppercase tracking-wider transition-all shadow-sm ${
+                                apiRecommended 
+                                ? 'bg-amber-50 border-amber-200 text-amber-600' 
+                                : 'bg-white border-gray-200 text-gray-400 hover:text-amber-500 hover:border-amber-200'
+                            }`}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill={apiRecommended ? "currentColor" : "none"} stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            <span className="hidden sm:inline">Recommended</span>
+                        </button>
+                    </div>
+
+                    <div className="w-px h-6 bg-gray-300/50 hidden lg:block mx-1"></div>
+
+                    {/* Local Filters */}
                     <div className="flex bg-gray-100/50 p-1 rounded-xl flex-shrink-0 border border-gray-200/50">
                         {(['all', 'won', 'lost'] as const).map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}
-                                className={`px-5 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
+                                className={`px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${
                                     filterType === type 
                                     ? 'bg-white text-gray-900 shadow-[0_2px_10px_rgba(0,0,0,0.06)]' 
                                     : 'text-gray-400 hover:text-gray-700 hover:bg-white/50'
@@ -365,7 +420,7 @@ export default function WdicSessionDetailPage() {
                             </button>
                         ))}
                     </div>
-                    <div className="w-px h-6 bg-gray-300/50 mx-1 hidden md:block"></div>
+                    
                     <button 
                         onClick={() => setHideFolds(!hideFolds)}
                         className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all whitespace-nowrap flex-shrink-0 shadow-sm ${
@@ -411,12 +466,22 @@ export default function WdicSessionDetailPage() {
                     
                     {/* Left: Hand# & Date Info */}
                     <div className="flex items-center gap-4 md:w-[180px] flex-shrink-0">
-                        <div className={`flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all shadow-sm flex-shrink-0 ${isWin ? 'bg-gradient-to-br from-green-50 to-emerald-100 text-green-700' : isLoss ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-400 group-hover:from-red-50 group-hover:to-rose-100 group-hover:text-[#D9114A]' : 'bg-gray-50 text-gray-400'}`}>
+                        <div className={`flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all shadow-sm flex-shrink-0 ${isWin ? 'bg-gradient-to-br from-green-50 to-emerald-100 text-green-700' : isLoss ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-400 group-hover:from-red-50 group-hover:to-rose-100 group-hover:text-[#D9114A]' : 'bg-gray-50 text-gray-400'} relative`}>
+                            {h.is_recommended && (
+                                <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center text-white shadow-md z-20 animate-bounce">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                </div>
+                            )}
                             <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">{t("hand_short")}</span>
                             <span className="text-sm md:text-base font-black tracking-tighter leading-none">#{handNumber}</span>
                         </div>
-                        <div className="flex flex-col justify-center gap-1.5">
-                            <PositionBadge pos={h.hero_position} />
+                        <div className="flex flex-col justify-center gap-1.5 w-full">
+                            <div className="flex items-center gap-2">
+                                <PositionBadge pos={h.hero_position} />
+                                {h.has_analysis && (
+                                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 border border-blue-200">AI</span>
+                                )}
+                            </div>
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">
                                 {formatDate(h.started_at)}
                             </span>

@@ -36,9 +36,12 @@ class HandListSerializer(serializers.ModelSerializer):
     ante = serializers.SerializerMethodField()
     bb_value = serializers.SerializerMethodField()
     board_cards_str = serializers.SerializerMethodField()
+    has_analysis = serializers.SerializerMethodField()
+    is_recommended = serializers.SerializerMethodField()
+
     class Meta:
         model = WdicHand
-        fields = ["id", "hand_no", "source", "started_at", "created_at", "hero_position", "hero_cards_str", "hero_collected", "hero_invested", "ante", "bb_value", "board_cards_str"]
+        fields = ["id", "hand_no", "source", "started_at", "created_at", "hero_position", "hero_cards_str", "hero_collected", "hero_invested", "ante", "bb_value", "board_cards_str", "has_analysis", "is_recommended"]
 
     def get_ante(self, obj) -> int:
         if not obj.actions_json: return 0
@@ -61,6 +64,15 @@ class HandListSerializer(serializers.ModelSerializer):
         if getattr(obj, 'river', None):  cards.append(obj.river)
         
         return " ".join(cards) if cards else None
+
+    def get_has_analysis(self, obj) -> bool:
+        return hasattr(obj, 'analysis')
+
+    def get_is_recommended(self, obj) -> bool:
+        bb = self.get_bb_value(obj)
+        if bb > 0:
+            return obj.hero_invested >= bb * 15
+        return obj.hero_invested >= 1000
 
 class HandAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
@@ -240,8 +252,32 @@ class SessionHandsView(GuestRequiredAPIView):
         session = WdicSession.objects.filter(id=session_id, guest=guest).first()
         if not session: raise Http404
 
-        # ✅ เรียงจาก ล่าสุด -> เก่าสุด (ใช้ started_at)
-        hands = session.hands.order_by("-started_at", "-created_at")[:limit]
+        # Start query with select_related for optimization
+        qs = session.hands.select_related("analysis")
+
+        # Filters
+        position = request.query_params.get("position")
+        if position:
+            qs = qs.filter(hero_position=position)
+
+        status_param = request.query_params.get("status")
+        if status_param == "analyzed":
+            qs = qs.filter(analysis__isnull=False)
+        elif status_param == "unanalyzed":
+            qs = qs.filter(analysis__isnull=True)
+
+        cards = request.query_params.get("cards")
+        if cards:
+            qs = qs.filter(hero_cards_str__icontains=cards)
+
+        recommended = request.query_params.get("recommended")
+        if recommended == "true":
+            # Just filter where analysis is null and order by invested to show big pots
+            qs = qs.filter(analysis__isnull=True).order_by("-hero_invested")
+        else:
+            qs = qs.order_by("-started_at", "-created_at")
+
+        hands = qs[:limit]
         session_with_count = WdicSession.objects.filter(id=session.id, guest=guest).annotate(handCount=Count("hands")).first()
 
         return Response({
