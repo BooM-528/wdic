@@ -4,7 +4,9 @@ import React, { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getGuestId } from "@/lib/guest.client";
-import { getHandDetail } from "@/lib/wdic/api.client"; 
+import { getHandDetail, analyzeHand } from "@/lib/wdic/api.client"; 
+import { useLanguage } from "@/lib/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // --- 1. Helper Functions ---
 
@@ -332,9 +334,24 @@ function PokerTable({ roster, heroName, board, pot, winners, bb, shownCards }: a
 // --- 4. Main Page ---
 
 export default function HandDetailPage() {
+  const { t, language } = useLanguage();
   const params = useParams<{ id: string }>();
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [analyzing, setAnalyzing] = useState(false);
+
+  const handleAnalyze = async (force = false) => {
+    if (!data?.id || analyzing) return;
+    setAnalyzing(true);
+    try {
+        const result = await analyzeHand(data.id, force, language);
+        setData({ ...data, analysis: result });
+    } catch (e) {
+        console.error("AI Analysis failed", e);
+    } finally {
+        setAnalyzing(false);
+    }
+  };
 
   useEffect(() => {
     async function load() {
@@ -364,7 +381,7 @@ export default function HandDetailPage() {
       return calculateAllPlayersNet(roster, data.actions_json?.actions || [], data.actions_json?.winners || []);
   }, [data, roster]);
 
-  if (loading || !data) return <div className="p-12 text-center text-gray-400 font-bold animate-pulse">LOADING HAND HISTORY...</div>;
+  if (loading || !data) return <div className="p-12 text-center text-gray-400 font-bold animate-pulse">{t("loading")}</div>;
 
   const {
     hand_no, hero_cards_str, hero_collected, hero_invested,
@@ -432,14 +449,17 @@ export default function HandDetailPage() {
         
         {/* Navigation */}
         <div className="flex items-center justify-between mb-8">
-            <Link href={`/wdic/sessions/${session_id}`} className="inline-flex items-center gap-2 group">
-                <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </div>
-                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Back to Session</span>
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href={`/wdic/sessions/${session_id}`} className="inline-flex items-center gap-2 group">
+                  <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                  </div>
+                  <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_session")}</span>
+              </Link>
+              <LanguageSwitcher />
+            </div>
             <div className="flex flex-col items-end">
-                <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">Hand #{hand_no}</span>
+                <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">{t("hand_no")} #{hand_no}</span>
                 <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{formatDate(started_at)}</span>
             </div>
         </div>
@@ -458,7 +478,7 @@ export default function HandDetailPage() {
                        <div className="text-center group/cards">
                            <div className="text-[10px] font-black text-blue-500 uppercase mb-3 tracking-[0.2em] flex items-center justify-center gap-2">
                                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                               Hero <PositionBadge pos={heroPos} />
+                               {t("hero")} <PositionBadge pos={heroPos} />
                            </div>
                            <div className="flex gap-2 p-3 bg-blue-50/30 rounded-2xl border border-blue-100/50 backdrop-blur-sm group-hover/cards:scale-105 transition-transform">
                                {hero_cards_str?.split(" ").map((c:string, i:number) => <Card key={i} card={c} size="lg" />)}
@@ -468,7 +488,7 @@ export default function HandDetailPage() {
                        {/* Board */}
                        {fullBoard.length > 0 && (
                            <div className="text-center group/board">
-                               <div className="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.2em]">Board</div>
+                               <div className="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.2em]">{t("board")}</div>
                                <div className="flex gap-1.5 p-3 bg-white/50 rounded-2xl border border-white shadow-sm group-hover/board:scale-105 transition-transform">
                                    <BoardDisplay cards={fullBoard} size="lg" />
                                </div>
@@ -476,10 +496,10 @@ export default function HandDetailPage() {
                        )}
                   </div>
 
-                  {/* Right: Result Group */}
+                  {/* Right: Result Group (Restored) */}
                   <div className="order-1 lg:order-2 flex flex-col items-center lg:items-end w-full lg:w-auto">
                       <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] mb-4 border shadow-sm ${isWin ? 'bg-green-50 text-green-700 border-green-100' : net < 0 ? 'bg-rose-50 text-[#D9114A] border-rose-100' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
-                          {isSplitPot ? "Split Pot" : isWin ? "You Won" : "You Lost"}
+                          {isSplitPot ? t("split_pot") : isWin ? t("you_won") : t("you_lost")}
                       </span>
                       
                       <div className="flex flex-col items-center lg:items-end">
@@ -497,6 +517,7 @@ export default function HandDetailPage() {
               </div>
           </div>
 
+
           {/* 2. POKER TABLE VISUALIZATION */}
           <div className="relative py-12">
               <PokerTable 
@@ -513,8 +534,8 @@ export default function HandDetailPage() {
           {/* 3. TABLE ROSTER (Players List) */}
           <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-white shadow-sm overflow-hidden">
               <div className="bg-white/40 px-6 py-3 border-b border-white/50 flex justify-between items-center">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Table Roster</span>
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 px-3 py-1 rounded-lg">Blinds: {formatNumber(actions_json?.blinds?.sb)} / {formatNumber(bb)}</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">{t("table_roster")}</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 px-3 py-1 rounded-lg">{t("blinds")}: {formatNumber(actions_json?.blinds?.sb)} / {formatNumber(bb)}</span>
               </div>
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-white/50">
                   {roster.map((p: any) => {
@@ -583,6 +604,96 @@ export default function HandDetailPage() {
                   )}
               </div>
           </div>
+
+              {/* 4.5 AI Analysis Section (Moved) */}
+              <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden group">
+                  <div className="bg-gradient-to-r from-[#D9114A]/5 to-blue-50/50 px-8 py-5 border-b border-white flex justify-between items-center">
+                      <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-2xl bg-gray-900 flex items-center justify-center text-white shadow-lg shadow-gray-200 rotate-3 group-hover:rotate-0 transition-transform">
+                              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                          </div>
+                          <div>
+                            <span className="block text-xs font-black text-gray-900 uppercase tracking-[0.2em]">{t("ai_insights")}</span>
+                            <span className="block text-[9px] font-bold text-gray-400 uppercase tracking-widest">{t("ai_insights_desc")}</span>
+                          </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3">
+                        {data.analysis && (
+                            <button 
+                                onClick={() => handleAnalyze(true)}
+                                disabled={analyzing}
+                                className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border
+                                    ${analyzing 
+                                        ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                                        : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900 active:scale-95'
+                                    }
+                                `}
+                            >
+                                {analyzing ? t("updating") : t("re_analyze")}
+                            </button>
+                        )}
+
+                        {!data.analysis ? (
+                            <button 
+                                onClick={() => handleAnalyze(false)}
+                                disabled={analyzing}
+                                className={`group/btn relative px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all
+                                    ${analyzing 
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                        : 'bg-gray-900 text-white hover:bg-[#D9114A] hover:shadow-xl hover:shadow-rose-100 active:scale-95'
+                                    }
+                                `}
+                            >
+                                {analyzing ? (
+                                    <div className="flex items-center gap-2">
+                                        <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                                        {t("loading")}
+                                    </div>
+                                ) : t("get_ai_insights")}
+                            </button>
+                        ) : (
+                            <div className="hidden md:flex items-center gap-2 text-[10px] font-bold text-green-600 bg-green-50 px-3 py-1.5 rounded-xl border border-green-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                                {t("analysis_complete")}
+                            </div>
+                        )}
+                      </div>
+                  </div>
+
+                  {data.analysis ? (
+                      <div className="p-8 md:p-12">
+                          <div className="flex items-center gap-4 mb-10">
+                              <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm
+                                  ${data.analysis.suggestion === 'GOOD_PLAY' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-blue-50 text-blue-700 border-blue-100'}
+                              `}>
+                                  {data.analysis.suggestion?.replace('_', ' ')}
+                              </div>
+                              <div className="h-px flex-1 bg-gradient-to-r from-gray-100 to-transparent"></div>
+                              <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic flex items-center gap-2">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                                  {data.analysis.model_name}
+                              </div>
+                          </div>
+                          
+                          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-medium selection:bg-rose-100">
+                              {data.analysis.content}
+                          </div>
+                      </div>
+                  ) : (
+                      <div className="p-20 text-center">
+                          <div className="inline-flex flex-col items-center gap-6">
+                              <div className="w-20 h-20 bg-gray-50 rounded-[2rem] border border-dashed border-gray-200 flex items-center justify-center text-gray-300 rotate-6">
+                                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                              </div>
+                               <div className="space-y-2">
+                                   <p className="text-sm font-black text-gray-600 uppercase tracking-widest">{t("no_analysis_title")}</p>
+                                   <p className="text-xs text-gray-400 max-w-[240px] leading-relaxed mx-auto uppercase font-bold tracking-tighter opacity-60">{t("no_analysis_desc")}</p>
+                               </div>
+                          </div>
+                      </div>
+                  )}
+              </div>
 
           {/* 5. NET RESULT SUMMARY */}
           <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-white overflow-hidden shadow-sm max-w-2xl mx-auto">

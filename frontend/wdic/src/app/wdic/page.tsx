@@ -5,6 +5,8 @@ import Link from "next/link";
 import { importSession, listSessions } from "@/lib/wdic/api.client";
 import { getGuestId } from "@/lib/guest.client";
 import type { WdicSession } from "@/lib/wdic/types";
+import { useLanguage } from "@/lib/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // ✅ Source Options - updated styling for the light theme
 const SOURCE_OPTIONS = [
@@ -13,6 +15,7 @@ const SOURCE_OPTIONS = [
 ];
 
 export default function WdicSessionsPage() {
+  const { t } = useLanguage();
   const [sessions, setSessions] = useState<WdicSession[]>([]);
   const [isBusy, setIsBusy] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -81,12 +84,15 @@ export default function WdicSessionsPage() {
         
         {/* Navbar / Top Bar */}
         <div className="flex items-center justify-between mb-8">
-            <Link href="/" className="inline-flex items-center gap-2 group">
-                <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:border-gray-400 transition-all shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </div>
-                <span className="text-sm font-bold text-gray-500 group-hover:text-gray-900 transition-colors">ย้อนกลับ</span>
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/" className="inline-flex items-center gap-2 group">
+                  <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:border-gray-400 transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                  </div>
+                  <span className="text-sm font-bold text-gray-500 group-hover:text-gray-900 transition-colors">{t("back")}</span>
+              </Link>
+              <LanguageSwitcher />
+            </div>
             
             <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">W</div>
@@ -96,11 +102,11 @@ export default function WdicSessionsPage() {
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
           <div className="max-w-xl">
-            <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-2 drop-shadow-sm text-gray-900">
+            <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-2 drop-shadow-sm text-gray-900 uppercase">
                 WHY DID I <span className="bg-gradient-to-br from-[#D9114A] to-rose-400 bg-clip-text text-transparent italic">CALL?</span>
             </h1>
             <p className="text-sm font-bold text-gray-400 tracking-[0.3em] uppercase">
-                Hand History Analytics Dashboard
+                {t("hand_history_analytics")}
             </p>
           </div>
           
@@ -109,7 +115,7 @@ export default function WdicSessionsPage() {
             
             {/* Dropdown Platform */}
             <div className="bg-white/80 backdrop-blur-md rounded-2xl p-2 border border-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] flex items-center justify-between transition-all hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
-                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-3">Platform:</span>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-3">{t("platform")}:</span>
                 <select 
                     value={selectedSource}
                     onChange={(e) => setSelectedSource(e.target.value)}
@@ -154,10 +160,10 @@ export default function WdicSessionsPage() {
                   </div>
                   <div className="space-y-1">
                       <span className={`block text-xs font-black uppercase tracking-widest transition-colors ${dragActive ? 'text-[#D9114A]' : 'text-gray-800'}`}>
-                          {isBusy ? "Importing Hand History..." : "Upload Session File"}
+                          {isBusy ? t("importing") : t("upload_session")}
                       </span>
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                        {error ? <span className="text-red-500">{error}</span> : `Drag ${currentSourceStyle.label} .txt format here`}
+                        {error ? <span className="text-red-500">{error}</span> : t("drag_drop_hint").replace("{platform}", currentSourceStyle.label)}
                       </span>
                   </div>
                 </div>
@@ -167,16 +173,16 @@ export default function WdicSessionsPage() {
 
         {/* Stats Summary Panel */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
-          <StatCard label="Total Sessions" value={sessions.length.toString()} color="text-gray-900" />
-          <StatCard label="Analyzed Hands" value={sessions.reduce((acc, s) => acc + (s.handCount || 0), 0).toLocaleString()} color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent" />
-          <StatCard label="Active Platform" value={currentSourceStyle.label} color="text-gray-400" />
+          <StatCard label={t("stats_total_sessions")} value={sessions.length.toString()} color="text-gray-900" />
+          <StatCard label={t("stats_analyzed_hands")} value={sessions.reduce((acc: number, s: any) => acc + (s.handCount || 0), 0).toLocaleString()} color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent" />
+          <StatCard label={t("stats_active_platform")} value={currentSourceStyle.label} color="text-gray-400" />
         </div>
 
         {/* Session List Header */}
         <div className="flex justify-between items-center mb-8 pb-4">
             <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
               <span className="w-2 h-8 bg-[#D9114A] rounded-full inline-block"></span>
-              ประวัติการวิเคราะห์
+              {t("analysis_history")}
             </h2>
             <button 
               onClick={refresh} 
@@ -184,7 +190,7 @@ export default function WdicSessionsPage() {
               className="text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors uppercase tracking-widest bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.06)] disabled:opacity-50 flex items-center gap-2"
             >
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={isBusy ? "animate-spin" : ""}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
-                Refresh
+                {t("refresh")}
             </button>
         </div>
         
@@ -199,8 +205,8 @@ export default function WdicSessionsPage() {
               <div className="w-20 h-20 bg-gray-100 rounded-[2rem] flex items-center justify-center text-4xl mb-6 shadow-inner text-gray-300">
                 🫙
               </div>
-              <div className="text-gray-900 font-black tracking-tight text-2xl mb-2">ยังไม่มีประวัติการวิเคราะห์</div>
-              <div className="text-gray-500 font-medium max-w-sm">อัพโหลดไฟล์ .txt จาก Natural8 เพื่อเริ่มต้นค้นหา Leak ของคุณทันที.</div>
+              <div className="text-gray-900 font-black tracking-tight text-2xl mb-2">{t("no_history_title")}</div>
+              <div className="text-gray-500 font-medium max-w-sm">{t("no_history_desc")}</div>
             </div>
           )}
         </div>
@@ -212,6 +218,7 @@ export default function WdicSessionsPage() {
 // --- Sub-Components ---
 
 function SessionCard({ session }: { session: WdicSession }) {
+  const { t } = useLanguage();
   const dateStr = session.started_at 
     ? new Date(session.started_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'})
     : new Date(session.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
@@ -249,7 +256,7 @@ function SessionCard({ session }: { session: WdicSession }) {
           
           <div className="mt-auto pt-6 border-t border-gray-100 flex justify-between items-end">
             <div>
-              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-1">Hands Played</div>
+              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-1">{t("hands_played")}</div>
               <div className="text-3xl font-black text-gray-900 tracking-tighter">
                 {session.handCount ?? 0}
               </div>

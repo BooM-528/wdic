@@ -2,8 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from 'next/link';
+import { useLanguage } from "@/lib/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function HomePage() {
+  const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
@@ -55,18 +58,21 @@ export default function HomePage() {
 
       {/* Navbar Container */}
       <nav className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-            W
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
+              W
+            </div>
+            <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
           </div>
-          <span className="text-xl font-black text-gray-900 tracking-tight">WHY DID I CALL</span>
+          <LanguageSwitcher />
         </div>
         <div>
           {loggedInUser ? (
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-gray-600">{loggedInUser}</span>
               <Link href="/wdic" className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-bold shadow-sm hover:bg-gray-800 transition-colors">
-                Dashboard
+                {t("dashboard")}
               </Link>
             </div>
           ) : (
@@ -74,7 +80,7 @@ export default function HomePage() {
               onClick={() => setIsModalOpen(true)}
               className="px-5 py-2.5 rounded-full bg-white border border-gray-200 text-gray-800 text-sm font-bold shadow-[0_2px_10px_rgb(0,0,0,0.03)] hover:shadow-[0_4px_15px_rgb(0,0,0,0.06)] hover:border-gray-300 transition-all text-center flex items-center gap-2"
             >
-              เข้าสู่ระบบ <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+              {t("login")} <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
             </button>
           )}
         </div>
@@ -83,27 +89,27 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-20 pb-32 text-center flex flex-col items-center">
         <div className="inline-block px-4 py-1.5 rounded-full bg-white border border-rose-100 text-[#D9114A] text-xs font-black uppercase tracking-widest mb-8 shadow-sm">
-          Poker Analytics Platform ♠️♥️
+          {t("hero_badge")}
         </div>
 
         <h1 className="text-5xl md:text-7xl font-black text-gray-900 tracking-tight leading-[1.1] mb-6 max-w-4xl drop-shadow-sm">
-          หยุด Call แบบไร้เหตุผล<br /> เริ่มวิเคราะห์เกมของคุณอย่าง<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9114A] to-rose-400">มือโปร</span>
+          {t("hero_title_part1")}<br /> {t("hero_title_part2Base")}<span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9114A] to-rose-400">{t("hero_title_pro")}</span>
         </h1>
 
         <p className="text-lg md:text-xl text-gray-500 font-medium max-w-2xl mb-12 leading-relaxed">
-          นำเข้า Hand History จาก <span className="text-gray-900 font-bold">Natural8</span> หรือแพลตฟอร์มโปรดของคุณ เพื่อค้นหาจุดอ่อน พัฒนา Win-Rate และเปลี่ยนคุณให้เป็นผู้เล่นที่เฉียบคมยิ่งขึ้น
+          {t("hero_subtitle")}
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <Link href="/wdic" className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#D9114A] text-white font-black text-lg shadow-[0_8px_25px_rgba(217,17,74,0.3)] hover:shadow-[0_12px_35px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
-            เริ่มใช้งานฟรี
+            {t("start_free")}
           </Link>
           <button
             onClick={() => setIsModalOpen(true)}
             className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white border border-gray-200 text-gray-700 font-black text-lg shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:bg-gray-50 hover:-translate-y-1 transition-all"
           >
-            ดูตัวอย่าง Dashboard
+            {t("view_demo")}
           </button>
         </div>
       </section>
@@ -111,27 +117,27 @@ export default function HomePage() {
       {/* Features Grid */}
       <section className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20 border-t border-gray-200/50">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">ฟีเจอร์หลักที่จะเปลี่ยนวิธีการเล่นของคุณ</h2>
-          <p className="text-gray-500 font-medium">แอปพลิเคชันของเราออกแบบมาเพื่อผู้เล่นที่ต้องการพัฒนาตัวเองอย่างจริงจัง</p>
+          <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">{t("features_title")}</h2>
+          <p className="text-gray-500 font-medium">{t("features_subtitle")}</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <FeatureCard
             icon="📥"
-            title="นำเข้า History ง่ายดาย"
-            desc="รองรับการวิเคราะห์ไฟล์ Hand History จาก Natural8 (.txt) และแพลตฟอร์มอื่นๆ ลากและวางไฟล์ลงในระบบก็พร้อมใช้งานทันที"
+            title={t("feature1_title")}
+            desc={t("feature1_desc")}
             color="from-blue-50 to-blue-100/50"
           />
           <FeatureCard
             icon="📊"
-            title="วิเคราะห์สถิติเชิงลึก"
-            desc="สรุปผลกำไร-ขาดทุนโดยรวม (Win/Loss), กราฟการเล่น และอัตราการชนะในแต่ละ Position อย่างละเอียด"
+            title={t("feature2_title")}
+            desc={t("feature2_desc")}
             color="from-rose-50 to-rose-100/50"
           />
           <FeatureCard
             icon="🔍"
-            title="ค้นหา Leak System"
-            desc="ระบบประมวลผลค้นหา 'จุดพร่อง' ของคุณ ช่วยไฮไลต์มือที่คุณ Call หรือ Fold ผิดพลาดบ่อยๆ เพื่อนำไปปรับปรุงแก้ไข"
+            title={t("feature3_title")}
+            desc={t("feature3_desc")}
             color="from-indigo-50 to-indigo-100/50"
           />
         </div>
@@ -140,19 +146,19 @@ export default function HomePage() {
       {/* How It Works */}
       <section className="relative z-10 w-full max-w-7xl mx-auto px-6 py-20">
         <div className="bg-white/80 backdrop-blur-2xl rounded-[3rem] border border-white p-10 md:p-16 shadow-[0_20px_60px_rgba(0,0,0,0.05)] text-center">
-          <h2 className="text-3xl font-black text-gray-900 mb-12">ขั้นตอนการใช้งาน</h2>
+          <h2 className="text-3xl font-black text-gray-900 mb-12">{t("how_it_works")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Connecting Line (Desktop Only) */}
             <div className="hidden md:block absolute top-[20%] left-1/6 right-1/6 h-0.5 bg-gray-200/50 z-0"></div>
 
-            <StepItem num="1" title="Upload" desc="ดาวน์โหลด Hand History จากเว็บต้นทางแล้วลากมาวางในระบบ" />
-            <StepItem num="2" title="Analyze" desc="ระบบจะประมวลผลข้อมูลหลายพันแฮนด์ของคุณในเสี้ยววินาที" />
-            <StepItem num="3" title="Improve" desc="ตรวจสอบจุดผิดพลาด เจาะลึกรายมือ แล้วกลับไปบดขยี้คู่แข่ง!" />
+            <StepItem num="1" title={t("step1_title")} desc={t("step1_desc")} />
+            <StepItem num="2" title={t("step2_title")} desc={t("step2_desc")} />
+            <StepItem num="3" title={t("step3_title")} desc={t("step3_desc")} />
           </div>
 
           <div className="mt-16">
             <Link href="/wdic" className="inline-flex px-8 py-4 rounded-2xl bg-gray-900 text-white font-black text-lg shadow-xl hover:bg-gray-800 hover:scale-105 transition-all">
-              เข้าสู่ Dashboard
+              {t("dashboard")}
             </Link>
           </div>
         </div>
@@ -162,7 +168,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-gray-900 font-bold">
             <div className="w-6 h-6 bg-[#D9114A] rounded text-white flex items-center justify-center text-xs">W</div>
-            WHY DID I CALL
+            {t("brand_name")}
           </div>
           <div className="text-sm font-semibold text-gray-400">
             © {new Date().getFullYear()} ArnisongK — Analytics for Serious Poker Players.

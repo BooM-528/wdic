@@ -15,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.models import GuestIdentity
-from wdic.models import WdicHand, WdicSession, WdicSource
+from wdic.models import WdicHand, WdicSession, WdicSource, WdicHandAnalysis, WdicSessionAnalysis
 from wdic.parser import (
     split_hands, parse_hand_meta, parse_hand_detail, calculate_sha256
 )
@@ -62,17 +62,25 @@ class HandListSerializer(serializers.ModelSerializer):
         
         return " ".join(cards) if cards else None
 
+class HandAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WdicHandAnalysis
+        fields = ["id", "hand_id", "content", "suggestion", "model_name", "prompt_version", "tokens_used", "created_at"]
+
 class HandDetailSerializer(serializers.ModelSerializer):
     ante = serializers.SerializerMethodField()
     bb_value = serializers.SerializerMethodField()
     board_cards_str = serializers.SerializerMethodField()
+    analysis = HandAnalysisSerializer(read_only=True)
+
     class Meta:
         model = WdicHand
         fields = [
             "id", "session_id", "hand_no", "source", "started_at", "raw_text", 
             "actions_json", "parsed_version", "created_at",
             "max_players", "hero_seat", "button_seat", "hero_position", 
-            "hero_cards_str", "hero_collected", "hero_invested", "ante", "bb_value", "board_cards_str"
+            "hero_cards_str", "hero_collected", "hero_invested", "ante", "bb_value", "board_cards_str",
+            "analysis"
         ]
 
     def get_ante(self, obj) -> int:
@@ -247,3 +255,39 @@ class HandDetailView(GuestRequiredAPIView):
         hand = WdicHand.objects.filter(id=hand_id, guest=guest).first()
         if not hand: raise Http404
         return Response(HandDetailSerializer(hand).data)
+
+class AnalyzeHandView(GuestRequiredAPIView):
+    def post(self, request, hand_id: UUID):
+        guest = self.get_guest(request)
+        hand = WdicHand.objects.filter(id=hand_id, guest=guest).first()
+        if not hand: raise Http404
+        
+        # 1. Check if we should force re-analyze or if it's new
+        # For simplicity, we'll allow re-analysis on every POST to this endpoint
+        # or we could check for a 'force' param in the request
+        force = request.data.get("force", False)
+        lang = request.data.get("lang", "th")
+        
+        if hasattr(hand, "analysis") and not force:
+            return Response(HandAnalysisSerializer(hand.analysis).data)
+            
+        # 2. Trigger AI Analysis
+        from wdic.ai_service import PokerAiService
+        ai_service = PokerAiService()
+        result = ai_service.analyze_hand(hand, lang=lang)
+        
+        # 3. Save or Update Analysis
+        with transaction.atomic():
+            if hasattr(hand, "analysis"):
+                hand.analysis.delete()
+                
+            analysis = WdicHandAnalysis.objects.create(
+                hand=hand,
+                content=result["content"],
+                suggestion=result["suggestion"],
+                model_name=result["model_name"],
+                prompt_version="v1",
+                tokens_used=result["tokens_used"]
+            )
+        
+        return Response(HandAnalysisSerializer(analysis).data, status=status.HTTP_201_CREATED)

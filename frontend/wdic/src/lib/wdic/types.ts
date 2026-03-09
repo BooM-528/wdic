@@ -21,6 +21,17 @@ export type WdicSessionHandsResponse = {
   hands: WdicHandListItem[];
 };
 
+export type WdicHandAnalysis = {
+  id: string;
+  hand_id: string;
+  content: string;
+  suggestion: string | null;
+  model_name: string;
+  prompt_version: string;
+  tokens_used: number;
+  created_at: string;
+};
+
 export type WdicHandDetail = {
   id: string;
   session_id: string;
@@ -28,14 +39,18 @@ export type WdicHandDetail = {
   source: string;
   started_at: string | null;
   raw_text: string;
-  actions_json: Array<{
-    street: string;
-    lineNo: number;
-    actor?: string;
-    verb: string;
-    amount?: number | null;
-    raw: string;
-  }> | null;
+  actions_json: any | null;
+  max_players: number;
+  hero_seat: number | null;
+  button_seat: number | null;
+  hero_position: string | null;
+  hero_cards_str: string | null;
+  hero_collected: number;
+  hero_invested: number;
+  ante: number;
+  bb_value: number;
+  board_cards_str: string | null;
   parsed_version: string;
   created_at: string;
+  analysis: WdicHandAnalysis | null;
 };

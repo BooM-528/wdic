@@ -21,3 +21,4 @@ redis>=5.0,<6.0           # สำหรับ Celery broker / cache
 # Environment variables
 python-dotenv>=1.0,<2.0   # จัดการ .env
 gunicorn>=23.0,<24.0
+google-generativeai>=0.8.0  # Gemini AI

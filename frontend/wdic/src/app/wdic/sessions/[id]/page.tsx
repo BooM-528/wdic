@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getSessionHands } from "@/lib/wdic/api.client";
 import { getGuestId } from "@/lib/guest.client";
+import { useLanguage } from "@/lib/LanguageContext";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 // --- Types ---
 interface WdicHandData {
@@ -125,6 +127,7 @@ function HandCards({ cardsStr, isBoard = false }: { cardsStr?: string | null, is
 // --- Main Page ---
 
 export default function WdicSessionDetailPage() {
+  const { t } = useLanguage();
   const params = useParams<{ id: string }>();
   const sessionId = params.id;
 
@@ -220,7 +223,7 @@ export default function WdicSessionDetailPage() {
 
 
   if (error) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-[#D9114A] font-black tracking-widest text-xl">{error}</div>;
-  if (!data || loading) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-gray-400 font-bold tracking-widest animate-pulse">LOADING SESSION...</div>;
+  if (!data || loading) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-gray-400 font-bold tracking-widest animate-pulse">{t("loading")}</div>;
 
   return (
     <div className="relative min-h-screen bg-[#F8F9FA] text-gray-800 font-sans selection:bg-[#D9114A]/20 pb-20 overflow-hidden">
@@ -236,12 +239,15 @@ export default function WdicSessionDetailPage() {
         
         {/* Navigation */}
         <div className="flex items-center justify-between mb-8">
-            <Link href="/wdic" className="inline-flex items-center gap-2 group">
-                <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </div>
-                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Back to Dashboard</span>
-            </Link>
+            <div className="flex items-center gap-6">
+              <Link href="/wdic" className="inline-flex items-center gap-2 group">
+                  <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                  </div>
+                  <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_dashboard")}</span>
+              </Link>
+              <LanguageSwitcher />
+            </div>
         </div>
 
         {/* Session Header Card (Glassmorphism) */}
@@ -259,22 +265,22 @@ export default function WdicSessionDetailPage() {
                         </span>
                     </div>
                     <h1 className="text-2xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight mb-6">
-                        {session.name || "Poker Session"}
+                        {session.name || t("poker_session")}
                     </h1>
                     
                     {/* Tags */}
                     <div className="flex gap-3">
                         <div className="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl border border-white shadow-sm">
                             <span className="w-2 h-2 rounded-full bg-blue-400"></span>
-                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:block">Hands Played</span>
+                            <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest hidden sm:block">{t("hands_played")}</span>
                             <span className="text-sm font-black text-gray-900">{session.handCount}</span>
                         </div>
                         {/* Duration */}
                         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-white bg-white/80 backdrop-blur-md shadow-sm">
                             <ClockIcon />
-                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 hidden sm:block">Duration</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-gray-400 hidden sm:block">{t("duration")}</span>
                             <span className="text-sm font-black text-gray-700">
-                                {durationStr}
+                                {durationStr.replace('h', t('hour_short')).replace('m', t('minute_short'))}
                             </span>
                         </div>
                     </div>
@@ -284,7 +290,7 @@ export default function WdicSessionDetailPage() {
                 <div className="grid grid-cols-2 gap-3 md:gap-4 w-full lg:w-auto min-w-0 md:min-w-[320px]">
                     <Link href={maxWinHandId ? `/wdic/hands/${maxWinHandId}` : "#"} className={`bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100/50 hover:border-green-300 hover:shadow-lg hover:-translate-y-1 p-5 rounded-3xl transition-all group/card ${!maxWinHandId && "pointer-events-none opacity-50"}`}>
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-green-700 font-bold uppercase tracking-widest">Biggest Win</span>
+                            <span className="text-[10px] text-green-700 font-bold uppercase tracking-widest">{t("biggest_win")}</span>
                             <TrophyIcon />
                         </div>
                         <div className="text-xl md:text-2xl font-black text-green-700 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
@@ -294,7 +300,7 @@ export default function WdicSessionDetailPage() {
 
                     <Link href={maxLossHandId ? `/wdic/hands/${maxLossHandId}` : "#"} className={`bg-gradient-to-br from-red-50 to-orange-50/50 border border-red-100/50 hover:border-red-300 hover:shadow-lg hover:-translate-y-1 p-5 rounded-3xl transition-all group/card ${!maxLossHandId && "pointer-events-none opacity-50"}`}>
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-red-700 font-bold uppercase tracking-widest">Biggest Loss</span>
+                            <span className="text-[10px] text-red-700 font-bold uppercase tracking-widest">{t("biggest_loss")}</span>
                             <TrendingDownIcon />
                         </div>
                         <div className="text-xl md:text-2xl font-black text-red-600 tracking-tighter group-hover/card:scale-105 transition-transform origin-left drop-shadow-sm">
@@ -304,7 +310,7 @@ export default function WdicSessionDetailPage() {
 
                     <div className="bg-gradient-to-br from-blue-50 to-indigo-50/50 border border-blue-100/50 p-5 rounded-3xl shadow-sm">
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-blue-700 font-bold uppercase tracking-widest">Total Won</span>
+                            <span className="text-[10px] text-blue-700 font-bold uppercase tracking-widest">{t("total_won")}</span>
                             <CoinsIcon />
                         </div>
                         <div className="text-xl md:text-2xl font-black text-blue-700 tracking-tighter drop-shadow-sm">
@@ -314,7 +320,7 @@ export default function WdicSessionDetailPage() {
 
                     <div className={`p-5 rounded-3xl border shadow-sm ${totalProfit >= 0 ? 'bg-white/80 border-white' : 'bg-white/80 border-white'}`}>
                         <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Net Result</span>
+                            <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">{t("net_result")}</span>
                             <ChartIcon />
                         </div>
                         <div className={`text-lg md:text-2xl font-black tracking-tighter drop-shadow-sm ${totalProfit >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
@@ -330,7 +336,7 @@ export default function WdicSessionDetailPage() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex items-center gap-3 px-2 hidden md:flex">
                     <span className="w-1.5 h-6 bg-[#D9114A] rounded-full"></span>
-                    <h2 className="text-sm font-black text-gray-800 uppercase tracking-widest">Hand History</h2>
+                    <h2 className="text-sm font-black text-gray-800 uppercase tracking-widest">{t("hand_history")}</h2>
                 </div>
                 <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-1 md:pb-0 hide-scrollbar">
                     <div className="flex bg-gray-100/50 p-1 rounded-xl flex-shrink-0 border border-gray-200/50">
@@ -344,7 +350,7 @@ export default function WdicSessionDetailPage() {
                                     : 'text-gray-400 hover:text-gray-700 hover:bg-white/50'
                                 }`}
                             >
-                                {type}
+                                {t(`filter_${type}`)}
                             </button>
                         ))}
                     </div>
@@ -360,7 +366,7 @@ export default function WdicSessionDetailPage() {
                         <div className={`w-4 h-4 rounded-md flex items-center justify-center transition-colors border ${hideFolds ? 'bg-blue-600 border-blue-600' : 'border-gray-300 bg-gray-50'}`}>
                             {hideFolds && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>}
                         </div>
-                        <span className="text-[10px] font-black uppercase tracking-widest">Hide Folds</span>
+                        <span className="text-[10px] font-black uppercase tracking-widest">{t("hide_folds")}</span>
                     </button>
                 </div>
             </div>
@@ -395,7 +401,7 @@ export default function WdicSessionDetailPage() {
                     {/* Left: Hand# & Date Info */}
                     <div className="flex items-center gap-4 md:w-[180px] flex-shrink-0">
                         <div className={`flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all shadow-sm flex-shrink-0 ${isWin ? 'bg-gradient-to-br from-green-50 to-emerald-100 text-green-700' : isLoss ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-400 group-hover:from-red-50 group-hover:to-rose-100 group-hover:text-[#D9114A]' : 'bg-gray-50 text-gray-400'}`}>
-                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">Hand</span>
+                            <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest opacity-80 mb-0.5">{t("hand_short")}</span>
                             <span className="text-sm md:text-base font-black tracking-tighter leading-none">#{handNumber}</span>
                         </div>
                         <div className="flex flex-col justify-center gap-1.5">
@@ -451,12 +457,12 @@ export default function WdicSessionDetailPage() {
                         ) : isBreakEven ? (
                             <>
                                 <span className="text-xl md:text-2xl font-black text-gray-400 tracking-tighter mt-1">0</span>
-                                <span className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md">Break Even</span>
+                                <span className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md">{t("break_even")}</span>
                             </>
                         ) : (
                             <div className="opacity-60 text-right w-full flex flex-col items-end">
                                 <span className="text-xl md:text-2xl font-black text-gray-400 tracking-tighter mt-1">-</span>
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md mt-1">Folded</span>
+                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md mt-1">{t("folded")}</span>
                             </div>
                         )}
                         
@@ -475,8 +481,8 @@ export default function WdicSessionDetailPage() {
           {filteredHands.length === 0 && (
               <div className="text-center py-20 bg-white/50 backdrop-blur-md rounded-[3rem] border border-white shadow-sm flex flex-col items-center">
                   <div className="text-4xl mb-4 opacity-50">👁️‍🗨️</div>
-                  <span className="text-gray-900 font-black text-lg tracking-tight">No hands found</span>
-                  <span className="text-sm font-medium text-gray-500 mt-2">Try adjusting your filters to see more results.</span>
+                  <span className="text-gray-900 font-black text-lg tracking-tight">{t("no_hands_found")}</span>
+                  <span className="text-sm font-medium text-gray-500 mt-2">{t("no_hands_found_desc")}</span>
               </div>
           )}
         </div>

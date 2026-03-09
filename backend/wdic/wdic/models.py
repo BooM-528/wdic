@@ -63,3 +63,33 @@ class WdicHand(models.Model):
         constraints = [
             models.UniqueConstraint(fields=["guest", "raw_hash"], name="wdic_hand_unique_per_guest")
         ]
+
+class WdicHandAnalysis(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    hand = models.OneToOneField(WdicHand, on_delete=models.CASCADE, related_name="analysis")
+    
+    # AI Output
+    content = models.TextField(help_text="Markdown format analysis content")
+    suggestion = models.CharField(max_length=64, blank=True, null=True, help_text="Summary: e.g., FOLD_PREFLOP, GOOD_CALL")
+    
+    # Metadata
+    model_name = models.CharField(max_length=64, default="gpt-4o")
+    prompt_version = models.CharField(max_length=32, default="v1")
+    tokens_used = models.IntegerField(default=0)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "wdic_hand_analysis"
+
+class WdicSessionAnalysis(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session = models.OneToOneField(WdicSession, on_delete=models.CASCADE, related_name="analysis")
+    
+    content = models.TextField()
+    model_name = models.CharField(max_length=64, default="gpt-4o")
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "wdic_session_analysis"

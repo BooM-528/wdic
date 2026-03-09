@@ -107,6 +107,7 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
     board_cards = []
     winners = []
     occupied_seats = []
+    players_data = [] # ✅ เก็บข้อมูลผู้เล่นทั้งหมด [ {seat, name, stack, position} ]
     
     blinds = {"sb": 0, "bb": 0, "ante": 0}
     max_players = 0
@@ -144,7 +145,15 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
             if m_seat:
                 seat_num = int(m_seat.group(1))
                 player_name = m_seat.group(2).strip()
+                stack_size = _parse_amount(m_seat.group(3)) # ✅ ดึง Stack Size
+                
                 occupied_seats.append(seat_num)
+                players_data.append({
+                    "seat": seat_num,
+                    "name": player_name,
+                    "stack": stack_size
+                })
+                
                 if player_name.upper() == "HERO":
                     hero_seat = seat_num
 
@@ -164,14 +173,9 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
                 cards_matches = CARDS_RE.findall(s) 
                 if cards_matches:
                     if street_name == "FLOP":
-                        # Flop: *** FLOP *** [Ah Kh Qd]
-                        # เอาวงเล็บแรกเลย
                         board_cards.extend(cards_matches[0].split())
                         
                     elif street_name in ["TURN", "RIVER"]:
-                        # Turn: *** TURN *** [Ah Kh Qd] [2s]
-                        # River: *** RIVER *** [Ah Kh Qd 2s] [Tc]
-                        # เอาวงเล็บสุดท้าย ([-1]) ซึ่งจะเป็นไพ่ใบใหม่เสมอ
                         if len(cards_matches) > 1:
                             new_card = cards_matches[-1].split()
                             board_cards.extend(new_card)
@@ -216,7 +220,6 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
         m_shows = SHOWS_CARDS_RE.search(s)
         if m_shows:
             actor = m_shows.group(1).strip()
-            # เราอาจจะเก็บไพ่ที่โชว์ไว้ใน field ใหม่ หรือใส่ใน raw action ก็ได้
             actions.append({"street": current_street, "actor": actor, "verb": "shows", "amount": 0, "raw": s})
             continue
 
@@ -257,7 +260,12 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
 
     if max_players == 0:
         max_players = len(occupied_seats) if occupied_seats else 6
-    hero_position = determine_position(hero_seat, button_seat, occupied_seats)
+    
+    # ✅ คำนวณตำแหน่งสำหรับผู้เล่นทุกคน
+    for p in players_data:
+        p["position"] = determine_position(p["seat"], button_seat, occupied_seats)
+
+    hero_position = next((p["position"] for p in players_data if p["seat"] == hero_seat), "UNK")
 
     return {
         "max_players": max_players,
@@ -268,6 +276,7 @@ def parse_hand_detail(raw_hand_text: str) -> Dict[str, Any]:
         "hero_collected": hero_collected,
         "hero_invested": hero_total_invested, 
         "blinds": blinds,
+        "players": players_data, # ✅ เพิ่มข้อมูลผู้เล่นทุกคนพร้อม Stack Size เข้าไป
         "total_pot": total_pot,
         "rake": rake,
         "board_cards": board_cards,
