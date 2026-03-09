@@ -77,7 +77,7 @@ export default function WdicSessionsPage() {
         <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto p-6 md:p-12">
+      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-12">
         
         {/* Navbar / Top Bar */}
         <div className="flex items-center justify-between mb-8">
@@ -166,7 +166,7 @@ export default function WdicSessionsPage() {
         </div>
 
         {/* Stats Summary Panel */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-12 md:mb-16">
           <StatCard label="Total Sessions" value={sessions.length.toString()} color="text-gray-900" />
           <StatCard label="Analyzed Hands" value={sessions.reduce((acc, s) => acc + (s.handCount || 0), 0).toLocaleString()} color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent" />
           <StatCard label="Active Platform" value={currentSourceStyle.label} color="text-gray-400" />
@@ -189,7 +189,7 @@ export default function WdicSessionsPage() {
         </div>
         
         {/* Session Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {sessions.length > 0 ? (
             sessions.map((session) => (
               <SessionCard key={session.id} session={session} />
@@ -221,7 +221,7 @@ function SessionCard({ session }: { session: WdicSession }) {
 
   return (
     <Link href={`/wdic/sessions/${session.id}`} className="block h-full outline-none">
-      <div className="group bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 cursor-pointer relative overflow-hidden h-full flex flex-col focus-visible:ring-4 ring-gray-200">
+      <div className="group bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] p-6 md:p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 cursor-pointer relative overflow-hidden h-full flex flex-col focus-visible:ring-4 ring-gray-200">
         
         {/* Decorative Floating Icon Background */}
         <div className="absolute -top-4 -right-4 w-32 h-32 bg-gradient-to-br from-gray-50 to-white rounded-full flex items-center justify-center opacity-40 group-hover:scale-110 group-hover:-rotate-12 group-hover:from-rose-50 group-hover:to-rose-100/50 transition-all duration-500 shadow-inner z-0 pointer-events-none">
@@ -267,11 +267,11 @@ function SessionCard({ session }: { session: WdicSession }) {
 
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
+    <div className="bg-white/70 backdrop-blur-xl p-6 md:p-8 rounded-[2rem] border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
       <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span> {label}
       </div>
-      <div className={`text-4xl lg:text-5xl font-black tracking-tighter ${color} drop-shadow-sm`}>{value}</div>
+      <div className={`text-3xl md:text-5xl font-black tracking-tighter ${color} drop-shadow-sm`}>{value}</div>
     </div>
   );
 }

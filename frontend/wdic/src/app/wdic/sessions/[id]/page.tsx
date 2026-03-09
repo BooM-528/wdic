@@ -245,7 +245,7 @@ export default function WdicSessionDetailPage() {
         </div>
 
         {/* Session Header Card (Glassmorphism) */}
-        <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-12 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden mb-8 group">
+        <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] md:rounded-[2.5rem] p-6 md:p-12 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden mb-8 group">
             
             <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-rose-100 to-rose-50 rounded-full blur-3xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
 
@@ -258,7 +258,7 @@ export default function WdicSessionDetailPage() {
                             {formatDate(session.started_at || session.created_at)}
                         </span>
                     </div>
-                    <h1 className="text-3xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight mb-6">
+                    <h1 className="text-2xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight mb-6">
                         {session.name || "Poker Session"}
                     </h1>
                     
@@ -281,7 +281,7 @@ export default function WdicSessionDetailPage() {
                 </div>
 
                 {/* Right: Stats Grid */}
-                <div className="grid grid-cols-2 gap-4 w-full lg:w-auto min-w-[320px]">
+                <div className="grid grid-cols-2 gap-3 md:gap-4 w-full lg:w-auto min-w-0 md:min-w-[320px]">
                     <Link href={maxWinHandId ? `/wdic/hands/${maxWinHandId}` : "#"} className={`bg-gradient-to-br from-green-50 to-emerald-50/50 border border-green-100/50 hover:border-green-300 hover:shadow-lg hover:-translate-y-1 p-5 rounded-3xl transition-all group/card ${!maxWinHandId && "pointer-events-none opacity-50"}`}>
                         <div className="flex justify-between items-start mb-2">
                             <span className="text-[10px] text-green-700 font-bold uppercase tracking-widest">Biggest Win</span>
@@ -317,7 +317,7 @@ export default function WdicSessionDetailPage() {
                             <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">Net Result</span>
                             <ChartIcon />
                         </div>
-                        <div className={`text-xl md:text-2xl font-black tracking-tighter drop-shadow-sm ${totalProfit >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
+                        <div className={`text-lg md:text-2xl font-black tracking-tighter drop-shadow-sm ${totalProfit >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
                             {totalProfit > 0 ? "+" : ""}{totalProfit.toLocaleString()}
                         </div>
                     </div>
@@ -385,7 +385,7 @@ export default function WdicSessionDetailPage() {
 
              return (
               <Link key={h.id} href={`/wdic/hands/${h.id}`} className="block group w-full focus-visible:outline-none focus-visible:ring-4 ring-rose-200 rounded-3xl">
-                <div className="bg-white/60 backdrop-blur-md border border-white rounded-[2rem] p-5 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 hover:bg-white/90 transition-all duration-300 cursor-pointer overflow-hidden relative">
+                <div className="bg-white/60 backdrop-blur-md border border-white rounded-[1.5rem] md:rounded-[2rem] p-4 md:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] hover:shadow-[0_15px_30px_rgba(0,0,0,0.06)] hover:-translate-y-1 hover:bg-white/90 transition-all duration-300 cursor-pointer overflow-hidden relative">
                   
                   {isWin && <div className="absolute top-0 right-0 w-32 h-32 bg-green-400/10 blur-3xl rounded-full translate-x-10 -translate-y-10"></div>}
                   {isLoss && <div className="absolute top-0 right-0 w-32 h-32 bg-red-400/10 blur-3xl rounded-full translate-x-10 -translate-y-10"></div>}

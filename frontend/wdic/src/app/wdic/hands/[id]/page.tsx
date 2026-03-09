@@ -249,8 +249,8 @@ function PokerTable({ roster, heroName, board, pot, winners, bb, shownCards }: a
   }
 
   return (
-    <div className="relative mx-auto bg-transparent my-24 md:my-28 select-none origin-center 
-        w-[340px] h-[580px] md:w-[700px] md:h-[350px] scale-[0.9] sm:scale-100 md:scale-100">
+    <div className="relative mx-auto bg-transparent my-16 md:my-28 select-none origin-center 
+        w-[320px] h-[540px] md:w-[700px] md:h-[350px] scale-[0.85] sm:scale-100 md:scale-100">
       
       {/* Table Felt */}
       <div className="absolute inset-4 bg-[#35654d] border-[8px] border-[#2c3e50] shadow-2xl flex flex-col items-center justify-center 
@@ -277,7 +277,7 @@ function PokerTable({ roster, heroName, board, pot, winners, bb, shownCards }: a
         const myCards = shownCards[player.name];
 
         return (
-          <div key={player.seat} className={`absolute ${posClass} flex flex-col items-center transition-all duration-500 z-30 w-[110px]`}>
+          <div key={player.seat} className={`absolute ${posClass} flex flex-col items-center transition-all duration-500 z-30 w-[90px] md:w-[110px]`}>
             
             {/* WIN Bubble: อยู่เหนือไพ่ (-top-9) */}
             {isWinner && (
@@ -483,7 +483,7 @@ export default function HandDetailPage() {
                       </span>
                       
                       <div className="flex flex-col items-center lg:items-end">
-                          <h1 className={`text-5xl md:text-6xl font-black tracking-tighter leading-none drop-shadow-sm ${net >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
+                          <h1 className={`text-4xl md:text-6xl font-black tracking-tighter leading-none drop-shadow-sm ${net >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
                               {net > 0 ? "+" : ""}{formatNumber(net)}
                           </h1>
                           {bb > 0 && (
@@ -606,7 +606,7 @@ export default function HandDetailPage() {
                                   {stat.invested > 0 && `Invested: ${formatNumber(stat.invested)}`}
                               </div>
                               <div className="w-1/3 text-right flex flex-col items-end">
-                                  <span className={`text-base font-black tracking-tight ${pNet > 0 ? 'text-green-600' : pNet < 0 ? 'text-[#D9114A]' : 'text-gray-400'}`}>
+                                  <span className={`text-sm md:text-base font-black tracking-tight ${pNet > 0 ? 'text-green-600' : pNet < 0 ? 'text-[#D9114A]' : 'text-gray-400'}`}>
                                       {pNet > 0 ? "+" : ""}{formatNumber(pNet)}
                                   </span>
                                   {bb > 0 && pNet !== 0 && (

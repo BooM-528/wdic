@@ -225,8 +225,8 @@ export default function HomePage() {
 
 function FeatureCard({ icon, title, desc, color }: { icon: string; title: string; desc: string; color: string }) {
   return (
-    <div className="bg-white/70 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] p-8 rounded-[2rem] transition-all duration-300 hover:-translate-y-2 group">
-      <div className={`w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300`}>
+    <div className="bg-white/70 backdrop-blur-xl border border-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] p-6 md:p-8 rounded-[2rem] transition-all duration-300 hover:-translate-y-2 group">
+      <div className={`w-14 h-14 md:w-16 md:h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center text-2xl md:text-3xl mb-6 shadow-inner group-hover:scale-110 transition-transform duration-300`}>
         {icon}
       </div>
       <h3 className="text-xl font-black text-gray-900 mb-3">{title}</h3>
