@@ -522,15 +522,23 @@ export default function HandDetailPage() {
             <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-10">
 
                 {/* Navigation */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="relative flex items-center justify-between mb-8 md:mb-12">
                     <div className="flex items-center gap-6">
                         <Link href={`/wdic/sessions/${session_id}`} className="inline-flex items-center gap-2 group">
-                            <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+                            <div className="w-10 h-10 bg-white border border-gray-200 rounded-xl flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:border-gray-400 transition-all shadow-sm">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6" /></svg>
                             </div>
-                            <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_session")}</span>
+                            <span className="text-sm font-black text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_session")}</span>
                         </Link>
                     </div>
+
+                    <div className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
+                          W
+                        </div>
+                        <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
+                    </div>
+
                     <div className="flex items-center gap-6">
                         <div className="flex flex-col items-end hidden sm:flex">
                             <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">{t("hand_no")} #{hand_no}</span>
