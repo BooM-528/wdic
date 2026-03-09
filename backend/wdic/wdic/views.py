@@ -42,6 +42,7 @@ class ImportSessionRequestSerializer(serializers.Serializer):
 class SessionListSerializer(serializers.ModelSerializer):
     handCount = serializers.IntegerField(read_only=True)
     analyzedCount = serializers.IntegerField(read_only=True)
+    analyzedSessionCount = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = WdicSession
@@ -54,6 +55,7 @@ class SessionListSerializer(serializers.ModelSerializer):
             "created_at",
             "handCount",
             "analyzedCount",
+            "analyzedSessionCount",
         ]
 
 
@@ -360,8 +362,9 @@ class SessionListView(GuestRequiredAPIView):
         qs = (
             WdicSession.objects.filter(guest=guest)
             .annotate(
-                handCount=Count("hands"),
-                analyzedCount=Count("hands", filter=Q(hands__analysis__isnull=False)),
+                handCount=Count("hands", distinct=True),
+                analyzedCount=Count("hands", filter=Q(hands__analysis__isnull=False), distinct=True),
+                analyzedSessionCount=Count("analysis", filter=Q(analysis__isnull=False), distinct=True),
             )
             .order_by("-created_at")[:limit]
         )

@@ -45,12 +45,13 @@ export const translations: Record<string, Record<string, string>> = {
     drag_drop_hint: "Drag {platform} .txt format here",
     stats_total_sessions: "Total Sessions",
     stats_analyzed_hands: "Analyzed Hands",
-    uploaded_hands: "Uploaded Hands",
+    uploaded_hands: "Total Hands",
     stats_active_platform: "Active Platform",
     analysis_history: "Analysis History",
     no_history_title: "No Analysis History Yet",
     no_history_desc: "Upload a Natural8 .txt file to start finding your leaks.",
     hands_played: "Hands Played",
+    stats_analyzed_sessions: "Analyzed Sessions",
 
     // Hand Detail
     hand_no: "Hand",
@@ -143,12 +144,13 @@ export const translations: Record<string, Record<string, string>> = {
     drag_drop_hint: "ลากไฟล์ .txt ของ {platform} มาที่นี่",
     stats_total_sessions: "เซสชั่นทั้งหมด",
     stats_analyzed_hands: "แฮนด์ที่วิเคราะห์แล้ว",
-    uploaded_hands: "แฮนด์ที่อัปโหลดทั้งหมด",
+    uploaded_hands: "แฮนด์ทั้งหมด",
     stats_active_platform: "แพลตฟอร์มที่ใช้งาน",
     analysis_history: "ประวัติการวิเคราะห์",
     no_history_title: "ยังไม่มีประวัติการวิเคราะห์",
     no_history_desc: "อัพโหลดไฟล์ .txt จาก Natural8 เพื่อเริ่มต้นค้นหา Leak ของคุณทันที.",
     hands_played: "แฮนด์ที่เล่น",
+    stats_analyzed_sessions: "เซสชั่นที่วิเคราะห์แล้ว",
 
     // Hand Detail
     hand_no: "แฮนด์ที่",
