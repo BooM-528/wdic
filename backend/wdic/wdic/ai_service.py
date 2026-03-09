@@ -56,9 +56,15 @@ class PokerAiService:
             logger.error(f"Gemini Analysis failed: {str(e)}")
             return self._get_mock_analysis(hand, error=str(e))
 
-    def _build_prompt(self, hand: WdicHand, data: Dict[str, Any], raw_text: str, lang: str) -> str:
-        lang_instruction = "Respond in THAI language." if lang == "th" else "Respond in ENGLISH language."
-        
+    def _build_prompt(
+        self, hand: WdicHand, data: Dict[str, Any], raw_text: str, lang: str
+    ) -> str:
+        lang_instruction = (
+            "Respond in THAI language."
+            if lang == "th"
+            else "Respond in ENGLISH language."
+        )
+
         prompt = f"""
 You are a professional high-stakes poker coach. Analyze the following hand history for the player 'HERO'.
 
@@ -82,8 +88,9 @@ INSTRUCTIONS:
    - d -> ♦ (Diamonds)
    - c -> ♣ (Clubs)
    Example: [As Qd] should be written as A♠ Q♦. Use these symbols throughout the analysis_markdown.
-3. Evaluate if the play was overall good, a blunder, or missed value.
-4. Return the response in the following JSON format:
+3. IMPORTANT: Use table positions (e.g. BTN, SB, BB, UTG, CO, etc.) to refer to players rather than using their screen names or IDs.
+4. Evaluate if the play was overall good, a blunder, or missed value.
+5. Return the response in the following JSON format:
 {{
   "analysis_markdown": "Your detailed analysis here...",
   "suggestion": "ONE_OF: GOOD_PLAY, BLUNDER, MISSED_VALUE, TRICKY_SPOT, NEUTRAL"
