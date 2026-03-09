@@ -190,7 +190,7 @@ function ActionRow({
           {/* Human-readable line */}
           <div style={{ display: "flex", alignItems: "baseline", gap: 8, flexWrap: "wrap" }}>
             <span style={{ fontWeight: 900 }} title={actorRaw}>
-                {actorShown}
+              {actorShown}
             </span>
             <span style={verbStyle}>{verb}</span>
             {amt && <span style={{ fontWeight: 800, opacity: 0.85 }}>{amt}</span>}
@@ -206,7 +206,7 @@ function ActionRow({
                 }}
                 title="WDIC marker"
               >
-                ← why did I call?
+                ← why did I call
               </span>
             )}
           </div>

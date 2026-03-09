@@ -31,24 +31,19 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://pookmitr.arnisongk.com"
-]
+CORS_ALLOWED_ORIGINS = ["http://localhost:3000", "https://pookmitr.arnisongk.com"]
 CORS_ALLOW_HEADERS = [
-    'accept',
-    'authorization',
-    'content-type',
-    'x-guest-id',
+    "accept",
+    "authorization",
+    "content-type",
+    "x-guest-id",
 ]
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost",
     "http://127.0.0.1",
-    "https://pookmitr.arnisongk.com"
+    "https://pookmitr.arnisongk.com",
 ]
-
-
 
 
 # Application definition
@@ -63,8 +58,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     "accounts",
-    "giftings",
-    "wdic"
+    "wdic",
 ]
 
 MIDDLEWARE = [
@@ -78,7 +72,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "wdic.urls"
+ROOT_URLCONF = "website.urls"
 
 TEMPLATES = [
     {
@@ -95,7 +89,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "wdic.wsgi.application"
+WSGI_APPLICATION = "website.wsgi.application"
 
 
 # Database

@@ -6,11 +6,9 @@ import { importSession, listSessions } from "@/lib/wdic/api.client";
 import { getGuestId } from "@/lib/guest.client";
 import type { WdicSession } from "@/lib/wdic/types";
 
-// ✅ กำหนด value ให้ตรงกับ Model Django: "n8", "gg", "pokerstars"
+// ✅ Source Options - updated styling for the light theme
 const SOURCE_OPTIONS = [
-  { value: "n8", label: "Natural8", color: "text-red-600", bg: "bg-red-50", border: "border-red-100" },
-  // { value: "gg", label: "GGPoker", color: "text-gray-900", bg: "bg-gray-100", border: "border-gray-200" },
-  // { value: "pokerstars", label: "PokerStars", color: "text-red-500", bg: "bg-red-50", border: "border-red-100" },
+  { value: "n8", label: "Natural8", color: "text-[#D9114A]", bg: "bg-rose-50", border: "border-rose-100" },
   { value: "unknown", label: "Unknown", color: "text-gray-400", bg: "bg-gray-50", border: "border-gray-100" },
 ];
 
@@ -20,7 +18,7 @@ export default function WdicSessionsPage() {
   const [dragActive, setDragActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   
-  // ✅ Default เป็น "n8" (Natural8) ตามที่คุณใช้งานหลัก
+  // ✅ Default is "n8" (Natural8)
   const [selectedSource, setSelectedSource] = useState("n8");
 
   const refresh = useCallback(async () => {
@@ -51,7 +49,6 @@ export default function WdicSessionsPage() {
         throw new Error("File is empty");
       }
 
-      // ✅ ส่งค่า selectedSource ซึ่งจะเป็น "n8" (ตัวเล็ก) ไปที่ Backend
       await importSession({
         rawFileText,
         name: file.name,
@@ -71,31 +68,53 @@ export default function WdicSessionsPage() {
   const currentSourceStyle = SOURCE_OPTIONS.find(s => s.value === selectedSource) || SOURCE_OPTIONS[0];
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 md:p-12 font-sans">
-      <div className="max-w-6xl mx-auto">
+    <div className="relative min-h-screen bg-[#F8F9FA] text-gray-800 font-sans selection:bg-[#D9114A]/20 pb-20">
+      
+      {/* 🌟 Dynamic Background Mesh Gradient Layer */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden pb-10 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-rose-200 animate-blob"></div>
+        <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-blue-100 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto p-6 md:p-12">
         
+        {/* Navbar / Top Bar */}
+        <div className="flex items-center justify-between mb-8">
+            <Link href="/" className="inline-flex items-center gap-2 group">
+                <div className="w-8 h-8 bg-white border border-gray-200 rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:border-gray-400 transition-all shadow-sm">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </div>
+                <span className="text-sm font-bold text-gray-500 group-hover:text-gray-900 transition-colors">ย้อนกลับ</span>
+            </Link>
+            
+            <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">W</div>
+            </div>
+        </div>
+
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-12 gap-8">
           <div className="max-w-xl">
-            <h1 className="text-5xl font-black text-gray-900 tracking-tighter mb-2 italic">
-                WHY DID I <span className="text-red-600">CALL?</span>
+            <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-2 drop-shadow-sm text-gray-900">
+                WHY DID I <span className="bg-gradient-to-br from-[#D9114A] to-rose-400 bg-clip-text text-transparent italic">CALL?</span>
             </h1>
             <p className="text-sm font-bold text-gray-400 tracking-[0.3em] uppercase">
-                Hand History Analytics
+                Hand History Analytics Dashboard
             </p>
           </div>
           
-          {/* Upload Area */}
+          {/* Upload Area (Glassmorphism) */}
           <div className="w-full lg:w-80 flex flex-col gap-4">
             
-            {/* ✅ Dropdown เลือก Platform */}
-            <div className="bg-white rounded-2xl p-2 border border-gray-200 shadow-sm flex items-center justify-between">
+            {/* Dropdown Platform */}
+            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-2 border border-white shadow-[0_4px_15px_rgba(0,0,0,0.03)] flex items-center justify-between transition-all hover:shadow-[0_8px_25px_rgba(0,0,0,0.05)]">
                 <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest pl-3">Platform:</span>
                 <select 
                     value={selectedSource}
                     onChange={(e) => setSelectedSource(e.target.value)}
                     className={`
-                        bg-transparent font-bold text-sm outline-none cursor-pointer py-1 px-2 rounded-lg
+                        bg-transparent font-black text-sm outline-none cursor-pointer py-1.5 px-3 rounded-xl hover:bg-white transition-colors
                         ${currentSourceStyle.color}
                     `}
                 >
@@ -117,27 +136,28 @@ export default function WdicSessionsPage() {
                   if (e.dataTransfer.files?.[0]) handleFileUpload(e.dataTransfer.files[0]);
                 }}
                 className={`
-                  relative group border-2 border-dashed rounded-[2rem] p-8 transition-all text-center cursor-pointer
-                  ${dragActive ? "border-red-600 bg-red-50 scale-105" : "border-gray-200 bg-white hover:border-red-400 shadow-sm"}
-                  ${isBusy ? "opacity-50 pointer-events-none" : ""}
+                  relative group border-2 border-dashed rounded-[2rem] p-8 transition-all duration-300 text-center cursor-pointer overflow-hidden
+                  ${dragActive ? "border-[#D9114A] bg-rose-50/80 scale-105" : "border-gray-300/50 bg-white/60 backdrop-blur-xl hover:border-rose-300 hover:bg-white shadow-sm hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"}
+                  ${isBusy ? "opacity-50 pointer-events-none animate-pulse" : ""}
                 `}
             >
                 <input 
                   type="file" 
-                  className="absolute inset-0 opacity-0 cursor-pointer" 
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+                  title="Upload .txt File"
                   onChange={(e) => e.target.files?.[0] && handleFileUpload(e.target.files[0])}
                   accept=".txt"
                 />
-                <div className="flex flex-col items-center gap-3">
-                  <div className={`p-4 rounded-2xl transition-colors ${dragActive ? "bg-red-600 text-white" : "bg-gray-100 text-gray-400"}`}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
+                <div className="flex flex-col items-center gap-3 relative z-0">
+                  <div className={`p-4 rounded-2xl transition-colors duration-300 ${dragActive ? "bg-[#D9114A] text-white shadow-lg" : "bg-gradient-to-br from-gray-100 to-gray-50 text-gray-400 group-hover:text-[#D9114A] group-hover:bg-rose-50"}`}>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={`${dragActive ? 'animate-bounce' : ''}`}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>
                   </div>
                   <div className="space-y-1">
-                      <span className="block text-xs font-black text-gray-800 uppercase tracking-widest">
-                          {isBusy ? "Importing..." : "Upload Session"}
+                      <span className={`block text-xs font-black uppercase tracking-widest transition-colors ${dragActive ? 'text-[#D9114A]' : 'text-gray-800'}`}>
+                          {isBusy ? "Importing Hand History..." : "Upload Session File"}
                       </span>
                       <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                        {error ? <span className="text-red-500">{error}</span> : `Drag ${currentSourceStyle.label} .txt`}
+                        {error ? <span className="text-red-500">{error}</span> : `Drag ${currentSourceStyle.label} .txt format here`}
                       </span>
                   </div>
                 </div>
@@ -145,31 +165,42 @@ export default function WdicSessionsPage() {
           </div>
         </div>
 
-        {/* Stats Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <StatCard label="Total Sessions" value={sessions.length.toString()} color="text-red-600" />
-          <StatCard label="Analyzed Hands" value={sessions.reduce((acc, s) => acc + (s.handCount || 0), 0).toLocaleString()} color="text-gray-900" />
+        {/* Stats Summary Panel */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+          <StatCard label="Total Sessions" value={sessions.length.toString()} color="text-gray-900" />
+          <StatCard label="Analyzed Hands" value={sessions.reduce((acc, s) => acc + (s.handCount || 0), 0).toLocaleString()} color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent" />
           <StatCard label="Active Platform" value={currentSourceStyle.label} color="text-gray-400" />
         </div>
 
         {/* Session List Header */}
-        <div className="flex justify-between items-center mb-8 border-b border-gray-100 pb-4">
-            <h2 className="text-xl font-black text-gray-800 uppercase tracking-tighter italic">Recent History</h2>
-            <button onClick={refresh} disabled={isBusy} className="text-[10px] font-black text-gray-400 hover:text-red-600 transition-colors uppercase tracking-widest bg-white px-4 py-2 rounded-full border border-gray-100 shadow-sm disabled:opacity-50">
+        <div className="flex justify-between items-center mb-8 pb-4">
+            <h2 className="text-2xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+              <span className="w-2 h-8 bg-[#D9114A] rounded-full inline-block"></span>
+              ประวัติการวิเคราะห์
+            </h2>
+            <button 
+              onClick={refresh} 
+              disabled={isBusy} 
+              className="text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors uppercase tracking-widest bg-white/80 backdrop-blur-md px-5 py-2.5 rounded-xl border border-white shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_4px_15px_rgba(0,0,0,0.06)] disabled:opacity-50 flex items-center gap-2"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={isBusy ? "animate-spin" : ""}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21v-5h5"/></svg>
                 Refresh
             </button>
         </div>
         
-        {/* Session Cards */}
+        {/* Session Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {sessions.length > 0 ? (
             sessions.map((session) => (
               <SessionCard key={session.id} session={session} />
             ))
           ) : (
-            <div className="col-span-full py-24 text-center bg-white rounded-[2.5rem] border-2 border-gray-100 border-dashed">
-              <div className="text-gray-200 font-black italic tracking-[0.4em] uppercase text-xl">No Data Found</div>
-              <div className="mt-2 text-xs text-gray-400">Import your first session above.</div>
+            <div className="col-span-full py-28 flex flex-col items-center justify-center text-center bg-white/50 backdrop-blur-xl rounded-[3rem] border border-white shadow-sm">
+              <div className="w-20 h-20 bg-gray-100 rounded-[2rem] flex items-center justify-center text-4xl mb-6 shadow-inner text-gray-300">
+                🫙
+              </div>
+              <div className="text-gray-900 font-black tracking-tight text-2xl mb-2">ยังไม่มีประวัติการวิเคราะห์</div>
+              <div className="text-gray-500 font-medium max-w-sm">อัพโหลดไฟล์ .txt จาก Natural8 เพื่อเริ่มต้นค้นหา Leak ของคุณทันที.</div>
             </div>
           )}
         </div>
@@ -185,43 +216,47 @@ function SessionCard({ session }: { session: WdicSession }) {
     ? new Date(session.started_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute:'2-digit'})
     : new Date(session.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
 
-  // แมป source จาก Backend ("n8") กลับมาเป็น Style
-  const sourceStyle = SOURCE_OPTIONS.find(s => s.value === session.source) || SOURCE_OPTIONS[3];
+  // Map source style
+  const sourceStyle = SOURCE_OPTIONS.find(s => s.value === session.source) || SOURCE_OPTIONS[1];
 
   return (
-    <Link href={`/wdic/sessions/${session.id}`} className="block h-full">
-      <div className="group bg-white border border-gray-100 rounded-[2rem] p-6 shadow-sm hover:shadow-2xl hover:border-red-200 transition-all cursor-pointer relative overflow-hidden h-full flex flex-col">
-        {/* Decorative BG */}
-        <div className="absolute -top-6 -right-6 p-10 opacity-5 group-hover:opacity-10 transition-opacity transform rotate-12 pointer-events-none">
-           <span className="font-black text-8xl italic text-gray-900 uppercase">
-             {session.source === 'n8' ? 'N8' : session.source === 'gg' ? 'GG' : 'PS'}
+    <Link href={`/wdic/sessions/${session.id}`} className="block h-full outline-none">
+      <div className="group bg-white/80 backdrop-blur-xl border border-white rounded-[2rem] p-8 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] hover:-translate-y-2 transition-all duration-300 cursor-pointer relative overflow-hidden h-full flex flex-col focus-visible:ring-4 ring-gray-200">
+        
+        {/* Decorative Floating Icon Background */}
+        <div className="absolute -top-4 -right-4 w-32 h-32 bg-gradient-to-br from-gray-50 to-white rounded-full flex items-center justify-center opacity-40 group-hover:scale-110 group-hover:-rotate-12 group-hover:from-rose-50 group-hover:to-rose-100/50 transition-all duration-500 shadow-inner z-0 pointer-events-none">
+           <span className="font-black text-6xl text-gray-200 group-hover:text-rose-200 uppercase transform rotate-12">
+             {session.source === 'n8' ? 'N8' : 'GG'}
            </span>
         </div>
         
         <div className="relative z-10 flex flex-col h-full">
-          <div className="mb-4">
-            <span className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border ${sourceStyle.color} ${sourceStyle.bg} ${sourceStyle.border} inline-block`}>
+          {/* Badge */}
+          <div className="mb-6 flex justify-between items-start">
+            <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl border border-white/50 ${sourceStyle.color} ${sourceStyle.bg} shadow-sm`}>
               {sourceStyle.label}
             </span>
           </div>
           
-          <h2 className="text-lg font-black text-gray-800 mb-1 group-hover:text-red-600 transition-colors truncate leading-tight">
+          <h3 className="text-xl font-black text-gray-800 mb-2 group-hover:text-[#D9114A] transition-colors line-clamp-2 leading-tight">
             {session.name || "Untitled Session"}
-          </h2>
+          </h3>
           
-          <div className="text-[10px] text-gray-400 font-bold mb-8 uppercase tracking-wide">
+          <div className="text-[11px] text-gray-400 font-bold mb-8 uppercase tracking-widest flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             {dateStr}
           </div>
           
-          <div className="mt-auto pt-6 border-t border-gray-50 flex justify-between items-end">
+          <div className="mt-auto pt-6 border-t border-gray-100 flex justify-between items-end">
             <div>
-              <div className="text-[9px] text-gray-300 uppercase font-black tracking-[0.2em] mb-1">Hands</div>
-              <div className="text-3xl font-mono font-black text-gray-900 tracking-tighter">
+              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-[0.2em] mb-1">Hands Played</div>
+              <div className="text-3xl font-black text-gray-900 tracking-tighter">
                 {session.handCount ?? 0}
               </div>
             </div>
-            <div className="bg-gray-900 text-white group-hover:bg-red-600 p-3 rounded-2xl transition-all shadow-lg group-hover:scale-110 group-hover:rotate-3">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            
+            <div className="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-400 group-hover:bg-[#D9114A] group-hover:text-white rounded-2xl transition-all duration-300 shadow group-hover:shadow-[0_8px_20px_rgba(217,17,74,0.3)] group-hover:scale-110 group-hover:-rotate-6">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </div>
           </div>
         </div>
@@ -232,9 +267,11 @@ function SessionCard({ session }: { session: WdicSession }) {
 
 function StatCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-      <div className="text-[10px] font-black text-gray-300 uppercase tracking-[0.2em] mb-2">{label}</div>
-      <div className={`text-4xl font-black tracking-tighter ${color}`}>{value}</div>
+    <div className="bg-white/70 backdrop-blur-xl p-8 rounded-[2rem] border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_15px_35px_rgba(0,0,0,0.06)] hover:-translate-y-1 transition-all duration-300">
+      <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-gray-300"></span> {label}
+      </div>
+      <div className={`text-4xl lg:text-5xl font-black tracking-tighter ${color} drop-shadow-sm`}>{value}</div>
     </div>
   );
 }
