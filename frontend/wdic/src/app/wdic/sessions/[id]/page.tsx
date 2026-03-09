@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { getSessionHands } from "@/lib/wdic/api.client";
+import { getSessionHands, analyzeSession } from "@/lib/wdic/api.client";
 import { getGuestId } from "@/lib/guest.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -137,6 +137,11 @@ export default function WdicSessionDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // Session Analysis State
+  const { language } = useLanguage();
+  const [sessionAnalysis, setSessionAnalysis] = useState<any>(null);
+  const [analyzingSession, setAnalyzingSession] = useState(false);
+
   // Api Filter States
   const [apiPosition, setApiPosition] = useState<string>('');
   const [apiStatus, setApiStatus] = useState<string>('');
@@ -157,6 +162,16 @@ export default function WdicSessionDetailPage() {
           recommended: apiRecommended
         }); 
         setData(res as unknown as PageData);
+
+        // Try to fetch existing session analysis silently
+        try {
+            const analysisRes = await analyzeSession(sessionId, false, language);
+            if (analysisRes && analysisRes.content) {
+                setSessionAnalysis(analysisRes);
+            }
+        } catch (e) {
+            // It might just not exist yet, so we ignore
+        }
       } catch (err: any) {
         console.error(err);
         setError(err.message || "Failed to load session");
@@ -165,7 +180,20 @@ export default function WdicSessionDetailPage() {
       }
     }
     void load();
-  }, [sessionId, apiPosition, apiStatus, apiRecommended]);
+  }, [sessionId, apiPosition, apiStatus, apiRecommended, language]);
+
+  const handleAnalyzeSession = async (force = false) => {
+    if (!sessionId || analyzingSession) return;
+    setAnalyzingSession(true);
+    try {
+        const result = await analyzeSession(sessionId, force, language);
+        setSessionAnalysis(result);
+    } catch (e) {
+        console.error("Session AI Analysis failed", e);
+    } finally {
+        setAnalyzingSession(false);
+    }
+  };
 
   const { session, hands } = data || { session: {} as any, hands: [] };
 
@@ -356,7 +384,72 @@ export default function WdicSessionDetailPage() {
             </div>
         </div>
 
-        {/* Filter Bar */}
+        {/* AI Session Analysis Section */}
+        <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden mb-8 group">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-white shadow-lg shadow-gray-200 rotate-3 group-hover:rotate-0 transition-transform">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    </div>
+                    <div>
+                      <span className="block text-sm font-black text-gray-900 uppercase tracking-[0.2em]">{t("session_ai_insights") || "Session AI Insights"}</span>
+                      <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{t("session_ai_insights_desc") || "Discover big leaks and overall performance"}</span>
+                    </div>
+                </div>
+                
+                <div>
+                  {sessionAnalysis ? (
+                      <button 
+                          onClick={() => handleAnalyzeSession(true)}
+                          disabled={analyzingSession}
+                          className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border
+                              ${analyzingSession 
+                                  ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900 active:scale-95 shadow-sm'
+                              }
+                          `}
+                      >
+                          {analyzingSession ? t("updating") : t("re_analyze")}
+                      </button>
+                  ) : (
+                      <button 
+                          onClick={() => handleAnalyzeSession(false)}
+                          disabled={analyzingSession}
+                          className={`group/btn relative px-8 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all
+                              ${analyzingSession 
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
+                                  : 'bg-gray-900 text-white hover:bg-[#D9114A] hover:shadow-xl hover:shadow-rose-100 active:scale-95'
+                              }
+                          `}
+                      >
+                          {analyzingSession ? (
+                              <div className="flex items-center gap-2">
+                                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                                  {t("loading")}
+                              </div>
+                          ) : t("analyze_full_session") || "✨ Analyze Full Session"}
+                      </button>
+                  )}
+                </div>
+            </div>
+
+            {sessionAnalysis && (
+                <div className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-medium selection:bg-rose-100 bg-white/50 p-6 md:p-10 rounded-[2rem] border border-white mt-8 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
+                    {sessionAnalysis.content}
+                    <div className="mt-6 pt-4 border-t border-gray-200/50 flex items-center justify-between">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                            {sessionAnalysis.model_name}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+
+        {/* --- Conditional Render: Show Hands only if Session is Analyzed --- */}
+        {sessionAnalysis ? (
+        <>
+            {/* Filter Bar */}
         <div className="sticky top-4 z-30 mb-6 bg-white/70 backdrop-blur-xl border border-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl p-2.5">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div className="flex items-center gap-3 px-2 hidden lg:flex">
@@ -581,6 +674,43 @@ export default function WdicSessionDetailPage() {
               </div>
           )}
         </div>
+        </>
+        ) : (
+            <div className="flex flex-col items-center justify-center py-20 px-4 mt-8 bg-white/50 backdrop-blur-md rounded-[3rem] border border-white shadow-sm text-center">
+                <div className="w-24 h-24 bg-gradient-to-br from-indigo-50 to-rose-50 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white">
+                    <span className="text-4xl">✨</span>
+                </div>
+                <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-3">
+                    Unlock AI Session Insights
+                </h2>
+                <p className="text-gray-500 font-medium max-w-md mx-auto mb-8 leading-relaxed">
+                    Analyze this session to uncover major leaks, review significant chip swings, and get personalized advice before diving into individual hands.
+                </p>
+                <button 
+                    onClick={() => handleAnalyzeSession(false)}
+                    disabled={analyzingSession}
+                    className={`group relative px-10 py-4 rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_8px_30px_rgba(217,17,74,0.2)]
+                        ${analyzingSession 
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' 
+                            : 'bg-[#D9114A] text-white hover:bg-[#E61A54] hover:shadow-[0_12px_40px_rgba(217,17,74,0.3)] active:scale-95'
+                        }
+                    `}
+                >
+                    {analyzingSession ? (
+                        <div className="flex items-center gap-3">
+                            <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                            {t("loading")}
+                        </div>
+                    ) : (
+                        <span className="flex items-center gap-2">
+                           {t("analyze_full_session") || "Analyze Full Session"}
+                           <svg className="group-hover:translate-x-1 transition-transform" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        </span>
+                    )}
+                </button>
+            </div>
+        )}
+
       </div>
     </div>
   );

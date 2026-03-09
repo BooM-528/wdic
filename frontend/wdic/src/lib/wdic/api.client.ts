@@ -30,6 +30,13 @@ export async function analyzeHand(handId: string, force = false, lang = "th"): P
   });
 }
 
+export async function analyzeSession(sessionId: string, force = false, lang = "th"): Promise<any> {
+  return apiFetch<any>(`/wdic/sessions/${sessionId}/analyze`, {
+    method: "POST",
+    body: JSON.stringify({ force, lang })
+  });
+}
+
 export async function importSession(payload: { rawFileText: string; name?: string; source?: string }) {
   return apiFetch<{ sessionId: string; handCount: number; skipped: number; handIds: string[] }>(
     `/wdic/sessions/import`,

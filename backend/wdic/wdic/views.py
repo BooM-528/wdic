@@ -137,6 +137,18 @@ class HandAnalysisSerializer(serializers.ModelSerializer):
         ]
 
 
+class SessionAnalysisSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WdicSessionAnalysis
+        fields = [
+            "id",
+            "session_id",
+            "content",
+            "model_name",
+            "created_at",
+        ]
+
+
 class HandDetailSerializer(serializers.ModelSerializer):
     ante = serializers.SerializerMethodField()
     bb_value = serializers.SerializerMethodField()
@@ -467,3 +479,38 @@ class AnalyzeHandView(GuestRequiredAPIView):
         return Response(
             HandAnalysisSerializer(analysis).data, status=status.HTTP_201_CREATED
         )
+
+
+class AnalyzeSessionView(GuestRequiredAPIView):
+    def post(self, request, session_id: UUID):
+        guest = self.get_guest(request)
+        session = WdicSession.objects.filter(id=session_id, guest=guest).first()
+        if not session:
+            raise Http404
+
+        force = request.data.get("force", False)
+        lang = request.data.get("lang", "th")
+
+        if hasattr(session, "analysis") and not force:
+            return Response(SessionAnalysisSerializer(session.analysis).data)
+
+        # Trigger AI Analysis
+        from wdic.ai_service import PokerAiService
+
+        ai_service = PokerAiService()
+        result = ai_service.analyze_session(session, lang=lang)
+
+        # Save or Update Analysis
+        with transaction.atomic():
+            analysis, created = WdicSessionAnalysis.objects.update_or_create(
+                session=session,
+                defaults={
+                    "content": result["content"],
+                    "model_name": result["model_name"],
+                }
+            )
+
+        return Response(
+            SessionAnalysisSerializer(analysis).data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK
+        )
+
