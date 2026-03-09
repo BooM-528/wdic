@@ -122,21 +122,21 @@ function PositionBadge({ pos }: { pos?: string | null }) {
   if (!pos || pos === "UNK" || pos === "OBS") return <span className="text-gray-300 text-[10px]">-</span>;
   
   const colors: Record<string, string> = {
-    BTN: "bg-emerald-100 text-emerald-800 border border-emerald-500",
-    CO:  "bg-teal-50 text-teal-700 border border-teal-500",
-    HJ:  "bg-amber-50 text-amber-700 border border-amber-500",
-    MP:  "bg-orange-50 text-orange-700 border border-orange-500",
-    "UTG+2": "bg-rose-50 text-rose-700 border border-rose-500",
-    "UTG+1": "bg-rose-50 text-rose-700 border border-rose-500",
-    UTG:     "bg-red-50 text-red-700 border border-red-500",
-    SB:  "bg-indigo-50 text-indigo-700 border border-indigo-500", 
-    BB:  "bg-indigo-100 text-indigo-900 border border-indigo-600",
+    BTN: "bg-emerald-50 text-emerald-600 border-emerald-200/50",
+    CO:  "bg-teal-50 text-teal-600 border-teal-200/50",
+    HJ:  "bg-amber-50 text-amber-600 border-amber-200/50",
+    MP:  "bg-orange-50 text-orange-600 border-orange-200/50",
+    "UTG+2": "bg-rose-50 text-rose-600 border-rose-200/50",
+    "UTG+1": "bg-rose-50 text-rose-600 border-rose-200/50",
+    UTG:     "bg-red-50 text-red-600 border-red-200/50",
+    SB:  "bg-indigo-50 text-indigo-600 border-indigo-200/50", 
+    BB:  "bg-indigo-100/50 text-indigo-700 border-indigo-300/50",
   };
 
-  const style = colors[pos] || colors[pos.split("+")[0]] || "bg-gray-50 text-gray-600 border border-gray-400";
+  const style = colors[pos] || colors[pos.split("+")[0]] || "bg-gray-50 text-gray-500 border-gray-200/50";
   
   return (
-    <span className={`text-[10px] font-black px-1.5 py-0.5 rounded ${style} uppercase tracking-wider shadow-md ring-1 ring-white/50 whitespace-nowrap`}>
+    <span className={`text-[10px] font-black px-2 py-0.5 rounded-lg border backdrop-blur-sm shadow-sm ${style} uppercase tracking-[0.1em] whitespace-nowrap w-fit`}>
       {pos}
     </span>
   );
@@ -150,22 +150,22 @@ function Card({ card, size = "md" }: { card: string; size?: "sm" | "md" | "lg" }
   let color = "text-gray-800";
   let icon = "";
   switch (suit) {
-    case 'h': color = "text-red-600"; icon = "♥"; break;
+    case 'h': color = "text-[#D9114A]"; icon = "♥"; break;
     case 'd': color = "text-blue-600"; icon = "♦"; break;
-    case 'c': color = "text-green-600"; icon = "♣"; break;
-    case 's': color = "text-black"; icon = "♠"; break;
+    case 'c': color = "text-emerald-600"; icon = "♣"; break;
+    case 's': color = "text-gray-900"; icon = "♠"; break;
   }
 
   const sizeClasses = {
-      lg: "w-12 h-16 md:w-14 md:h-20 text-lg md:text-2xl rounded-md md:rounded-lg shadow-md",
-      md: "w-10 h-14 md:w-10 md:h-14 text-sm md:text-base rounded shadow-sm",
-      sm: "w-9 h-12 md:w-10 md:h-14 text-xs md:text-sm rounded-sm border shadow-sm"
+      lg: "w-12 h-16 md:w-14 md:h-20 text-lg md:text-2xl rounded-xl shadow-sm",
+      md: "w-10 h-14 md:w-10 md:h-14 text-sm md:text-base rounded-lg shadow-sm font-black",
+      sm: "w-9 h-12 md:w-10 md:h-14 text-xs md:text-sm rounded-lg border shadow-sm font-black"
   };
 
   return (
-    <div className={`${sizeClasses[size]} flex flex-col items-center justify-center bg-white border border-gray-300 select-none`}>
-      <span className={`font-bold leading-none ${color}`}>{rank}</span>
-      <span className={`leading-none ${color} mt-0.5`}>{icon}</span>
+    <div className={`${sizeClasses[size]} flex flex-col items-center justify-center bg-white border border-gray-100 select-none group-hover:shadow-md transition-shadow`}>
+      <span className={`font-black leading-none ${color}`}>{rank}</span>
+      <span className={`leading-none ${color} mt-0.5 opacity-80`}>{icon}</span>
     </div>
   );
 }
@@ -195,21 +195,21 @@ function BoardDisplay({ cards, size = "md" }: { cards: string[], size?: "sm"|"md
 
 function ActionBadge({ verb }: { verb: string }) {
   const v = verb.toLowerCase();
-  let style = "bg-gray-100 text-gray-500 border-gray-200";
+  let style = "bg-gray-50 text-gray-400 border-gray-100";
   
   if (v.includes("all-in")) {
-      style = "bg-red-600 text-white border-red-700 font-black shadow-sm ring-1 ring-red-500/50";
+      style = "bg-[#D9114A] text-white border-rose-400/50 font-black shadow-[0_4px_12px_rgba(217,17,74,0.3)] ring-2 ring-white/20";
   }
-  else if (v.includes("fold")) style = "bg-gray-50 text-gray-400 border-gray-100 line-through decoration-gray-300";
-  else if (v.includes("check")) style = "bg-gray-100 text-gray-600 border-gray-200";
-  else if (v.includes("call")) style = "bg-blue-50 text-blue-700 border-blue-200";
-  else if (v.includes("bet")) style = "bg-orange-50 text-orange-700 border-orange-200";
-  else if (v.includes("raise")) style = "bg-red-50 text-red-700 border-red-200 font-bold";
-  else if (v.includes("return")) style = "bg-green-50 text-green-700 border-green-200";
-  else if (v.includes("show")) style = "bg-purple-50 text-purple-700 border-purple-200 font-bold";
+  else if (v.includes("fold")) style = "bg-gray-100/50 text-gray-300 border-gray-100 line-through decoration-gray-300/50";
+  else if (v.includes("check")) style = "bg-gray-100 text-gray-500 border-gray-200/50";
+  else if (v.includes("call")) style = "bg-blue-50 text-blue-600 border-blue-200/50";
+  else if (v.includes("bet")) style = "bg-orange-50 text-orange-600 border-orange-200/50";
+  else if (v.includes("raise")) style = "bg-rose-50 text-[#D9114A] border-rose-200/50 font-black";
+  else if (v.includes("return")) style = "bg-green-50 text-green-600 border-green-200/50";
+  else if (v.includes("show")) style = "bg-purple-50 text-purple-600 border-purple-200/50 font-black";
   
   return (
-    <span className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wide border ${style} block w-fit`}>
+    <span className={`px-2.5 py-1 rounded-lg text-[9px] uppercase font-black tracking-[0.1em] border shadow-sm ${style} block w-fit transition-transform hover:scale-105`}>
       {verb}
     </span>
   );
@@ -419,187 +419,209 @@ export default function HandDetailPage() {
   const heroLabel = `Hero (${heroPos})`;
 
   return (
-    <div className="min-h-screen bg-[#F2F4F7] pb-20 font-sans text-gray-900">
+    <div className="relative min-h-screen bg-[#F8F9FA] text-gray-800 font-sans selection:bg-[#D9114A]/20 pb-20 overflow-hidden">
       
-      {/* Navbar */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 sticky top-0 z-20 flex items-center justify-between shadow-sm">
-        <Link href={`/wdic/sessions/${session_id}`} className="text-gray-500 hover:text-gray-900 text-xs font-bold uppercase tracking-widest transition-colors">
-           ← Back
-        </Link>
-        <div className="flex flex-col items-end">
-            <span className="text-[10px] font-bold text-gray-400">#{hand_no}</span>
-            <span className="text-[10px] font-bold text-gray-300">{formatDate(started_at)}</span>
-        </div>
+      {/* 🌟 Dynamic Background Mesh Gradient Layer */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-rose-200 animate-blob"></div>
+        <div className="fixed top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-blue-100 animate-blob animation-delay-2000"></div>
+        <div className="fixed bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
       </div>
 
-      <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
-
-        {/* 1. Header Layout */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                
-                {/* Left: Cards Group */}
-                <div className="order-2 md:order-1 flex items-center gap-4 md:gap-8">
-                     {/* Hero Hand */}
-                     <div className="text-center">
-                         <div className="text-[9px] font-bold text-blue-500 uppercase mb-2 flex items-center justify-center gap-1">
-                             Hero <PositionBadge pos={heroPos} />
-                         </div>
-                         <div className="flex gap-1.5">
-                             {hero_cards_str?.split(" ").map((c:string, i:number) => <Card key={i} card={c} size="lg" />)}
-                         </div>
-                     </div>
-
-                     {/* Board */}
-                     {fullBoard.length > 0 && (
-                         <div className="text-center">
-                             <div className="text-[9px] font-bold text-gray-400 uppercase mb-2">Board</div>
-                             <BoardDisplay cards={fullBoard} size="lg" />
-                         </div>
-                     )}
+      <div className="relative z-10 max-w-5xl mx-auto p-4 md:p-10">
+        
+        {/* Navigation */}
+        <div className="flex items-center justify-between mb-8">
+            <Link href={`/wdic/sessions/${session_id}`} className="inline-flex items-center gap-2 group">
+                <div className="w-8 h-8 bg-white/80 backdrop-blur-md border border-white rounded-lg flex items-center justify-center text-gray-400 group-hover:text-gray-900 group-hover:bg-white transition-all shadow-sm">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
                 </div>
-
-                {/* Right: Result Group */}
-                <div className="order-1 md:order-2 flex flex-col items-center md:items-end w-full md:w-auto">
-                    <span className={`px-3 py-1 rounded-lg text-xs font-black uppercase tracking-widest mb-2 ${isWin ? 'bg-green-100 text-green-700' : net < 0 ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-500'}`}>
-                        {isSplitPot ? "Split Pot" : isWin ? "You Won" : "You Lost"}
-                    </span>
-                    
-                    <div className="flex flex-col items-center md:items-end">
-                        <h1 className={`text-4xl md:text-5xl font-black tracking-tighter leading-none ${net >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {net > 0 ? "+" : ""}{formatNumber(net)}
-                        </h1>
-                        {bb > 0 && (
-                            <span className={`px-2 py-0.5 rounded text-xs font-bold mt-1 ${net >= 0 ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-                                {(net/bb).toFixed(1)} BB
-                            </span>
-                        )}
-                    </div>
-                </div>
-
+                <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">Back to Session</span>
+            </Link>
+            <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">Hand #{hand_no}</span>
+                <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{formatDate(started_at)}</span>
             </div>
         </div>
 
-        {/* 2. POKER TABLE VISUALIZATION */}
-        <PokerTable 
-            roster={roster} 
-            heroName="Hero" 
-            board={fullBoard} 
-            pot={totalPot}
-            winners={winners}
-            bb={bb}
-            shownCards={shownCards} 
-        />
+        <div className="space-y-8">
 
-        {/* 3. TABLE ROSTER (Players List) */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <div className="bg-gray-50 px-4 py-2 border-b border-gray-200 flex justify-between items-center">
-                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest">Players</span>
-                <span className="text-[10px] font-bold text-gray-400">Blinds: {formatNumber(actions_json?.blinds?.sb)}/{formatNumber(bb)}</span>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-6 divide-x divide-y md:divide-y-0 divide-gray-100">
-                {roster.map((p: any) => {
-                    const isHero = p.name === "Hero";
-                    return (
-                        <div key={p.seat} className={`p-3 text-center flex flex-col items-center justify-center ${isHero ? 'bg-blue-50/40' : ''}`}>
-                            <div className="mb-1">
-                                <PositionBadge pos={p.pos} />
-                            </div>
-                            <div className={`text-xs font-bold truncate max-w-[100px] ${isHero ? 'text-blue-700' : 'text-gray-700'}`}>{p.name}</div>
-                            <div className="text-xs font-mono text-gray-500">{formatNumber(p.stack)}</div>
-                            <div className="text-[9px] font-bold text-gray-300">{formatBB(p.stack, bb)}</div>
-                        </div>
-                    )
-                })}
-            </div>
+          {/* 1. Header Layout (Premium Glassmorphism) */}
+          <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden group">
+              <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-rose-100 to-rose-50 rounded-full blur-3xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
+              
+              <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+                  
+                  {/* Left: Cards Group */}
+                  <div className="order-2 lg:order-1 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                       {/* Hero Hand */}
+                       <div className="text-center group/cards">
+                           <div className="text-[10px] font-black text-blue-500 uppercase mb-3 tracking-[0.2em] flex items-center justify-center gap-2">
+                               <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                               Hero <PositionBadge pos={heroPos} />
+                           </div>
+                           <div className="flex gap-2 p-3 bg-blue-50/30 rounded-2xl border border-blue-100/50 backdrop-blur-sm group-hover/cards:scale-105 transition-transform">
+                               {hero_cards_str?.split(" ").map((c:string, i:number) => <Card key={i} card={c} size="lg" />)}
+                           </div>
+                       </div>
+
+                       {/* Board */}
+                       {fullBoard.length > 0 && (
+                           <div className="text-center group/board">
+                               <div className="text-[10px] font-black text-gray-400 uppercase mb-3 tracking-[0.2em]">Board</div>
+                               <div className="flex gap-1.5 p-3 bg-white/50 rounded-2xl border border-white shadow-sm group-hover/board:scale-105 transition-transform">
+                                   <BoardDisplay cards={fullBoard} size="lg" />
+                               </div>
+                           </div>
+                       )}
+                  </div>
+
+                  {/* Right: Result Group */}
+                  <div className="order-1 lg:order-2 flex flex-col items-center lg:items-end w-full lg:w-auto">
+                      <span className={`px-4 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] mb-4 border shadow-sm ${isWin ? 'bg-green-50 text-green-700 border-green-100' : net < 0 ? 'bg-rose-50 text-[#D9114A] border-rose-100' : 'bg-gray-50 text-gray-500 border-gray-100'}`}>
+                          {isSplitPot ? "Split Pot" : isWin ? "You Won" : "You Lost"}
+                      </span>
+                      
+                      <div className="flex flex-col items-center lg:items-end">
+                          <h1 className={`text-5xl md:text-6xl font-black tracking-tighter leading-none drop-shadow-sm ${net >= 0 ? 'text-green-600' : 'text-[#D9114A]'}`}>
+                              {net > 0 ? "+" : ""}{formatNumber(net)}
+                          </h1>
+                          {bb > 0 && (
+                              <span className={`px-3 py-1 rounded-lg text-xs font-black mt-2 shadow-sm ${net >= 0 ? 'bg-green-100 text-green-800' : 'bg-rose-100 text-[#D9114A]'}`}>
+                                  {(net/bb).toFixed(1)} BB
+                              </span>
+                          )}
+                      </div>
+                  </div>
+
+              </div>
+          </div>
+
+          {/* 2. POKER TABLE VISUALIZATION */}
+          <div className="relative py-12">
+              <PokerTable 
+                  roster={roster} 
+                  heroName="Hero" 
+                  board={fullBoard} 
+                  pot={totalPot}
+                  winners={winners}
+                  bb={bb}
+                  shownCards={shownCards} 
+              />
+          </div>
+
+          {/* 3. TABLE ROSTER (Players List) */}
+          <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-white shadow-sm overflow-hidden">
+              <div className="bg-white/40 px-6 py-3 border-b border-white/50 flex justify-between items-center">
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Table Roster</span>
+                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 px-3 py-1 rounded-lg">Blinds: {formatNumber(actions_json?.blinds?.sb)} / {formatNumber(bb)}</span>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 divide-x divide-y md:divide-y-0 divide-white/50">
+                  {roster.map((p: any) => {
+                      const isHero = p.name === "Hero";
+                      return (
+                          <div key={p.seat} className={`p-5 text-center flex flex-col items-center justify-center transition-colors hover:bg-white/40 ${isHero ? 'bg-blue-50/30' : ''}`}>
+                              <div className="mb-2">
+                                  <PositionBadge pos={p.pos} />
+                              </div>
+                              <div className={`text-sm font-black truncate max-w-[100px] mb-1 ${isHero ? 'text-blue-700' : 'text-gray-800'}`}>{p.name}</div>
+                              <div className="text-[11px] font-mono font-bold text-gray-500">{formatNumber(p.stack)}</div>
+                              <div className="text-[9px] font-black text-gray-300 uppercase tracking-tighter">{formatBB(p.stack, bb)}</div>
+                          </div>
+                      )
+                  })}
+              </div>
+          </div>
+
+          {/* 4. THE HAND TABLE (Action Grid) */}
+          <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] overflow-hidden">
+              
+              {/* Setup */}
+              {sections.SETUP.length > 0 && (
+                  <div className="bg-gray-50/50 border-b border-white px-6 py-3 text-[10px] text-gray-400 flex flex-wrap gap-x-6 gap-y-2">
+                      <span className="font-black uppercase tracking-[0.2em] text-gray-400">Setup Actions</span>
+                      {sections.SETUP.map((act: any, i: number) => (
+                          <span key={i} className="flex items-center gap-1.5 whitespace-nowrap">
+                              <b className={`font-black uppercase ${act.actor==="Hero"?"text-blue-500":"text-gray-500"}`}>{act.actor==="Hero"?"Hero":roster.find((r:any)=>r.name===act.actor)?.pos}</b> 
+                              <span className="opacity-60">{act.verb}</span> 
+                              <b className="font-mono text-gray-600">{formatNumber(act.amount)}</b>
+                          </span>
+                      ))}
+                  </div>
+              )}
+
+              <div className="w-full">
+                  <StreetHeader title="PREFLOP" />
+                  <ActionTable actions={sections.PREFLOP} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
+
+                  {sections.FLOP.length > 0 && (
+                      <>
+                          <StreetHeader title="FLOP" cards={flopCards} />
+                          <ActionTable actions={sections.FLOP} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
+                      </>
+                  )}
+
+                  {(sections.TURN.length > 0 || turnCards.length > 0) && (
+                      <>
+                          <StreetHeader title="TURN" cards={turnCards} />
+                          <ActionTable actions={sections.TURN} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
+                      </>
+                  )}
+
+                  {(sections.RIVER.length > 0 || riverCards.length > 0) && (
+                      <>
+                          <StreetHeader title="RIVER" cards={riverCards} />
+                          <ActionTable actions={sections.RIVER} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
+                      </>
+                  )}
+
+                  {sections.SHOWDOWN.length > 0 && (
+                      <>
+                          <StreetHeader title="SHOWDOWN" color="bg-rose-50/50 border-rose-100/50" textColor="text-[#D9114A]" />
+                          <ActionTable actions={sections.SHOWDOWN} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} isShowdown />
+                      </>
+                  )}
+              </div>
+          </div>
+
+          {/* 5. NET RESULT SUMMARY */}
+          <div className="bg-white/60 backdrop-blur-md rounded-3xl border border-white overflow-hidden shadow-sm max-w-2xl mx-auto">
+              <div className="bg-gray-900/90 backdrop-blur-md px-6 py-3">
+                  <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Performance Summary</span>
+              </div>
+              <div className="divide-y divide-white/50">
+                  {Object.entries(playerStats).map(([player, stat]: any) => {
+                      if (stat.invested === 0 && stat.collected === 0) return null;
+                      const isHero = player === "Hero";
+                      const pInfo = roster.find((r:any)=>r.name===player);
+                      const pNet = stat.net;
+
+                      return (
+                          <div key={player} className={`flex justify-between items-center px-6 py-4 transition-colors hover:bg-white/40 ${isHero ? 'bg-blue-50/20' : ''}`}>
+                              <div className="flex items-center gap-3 w-1/3">
+                                  <PositionBadge pos={pInfo?.pos} />
+                                  <span className={`text-sm font-black ${isHero ? 'text-blue-600' : 'text-gray-800'}`}>{player}</span>
+                              </div>
+                              <div className="w-1/3 text-center text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                  {stat.invested > 0 && `Invested: ${formatNumber(stat.invested)}`}
+                              </div>
+                              <div className="w-1/3 text-right flex flex-col items-end">
+                                  <span className={`text-base font-black tracking-tight ${pNet > 0 ? 'text-green-600' : pNet < 0 ? 'text-[#D9114A]' : 'text-gray-400'}`}>
+                                      {pNet > 0 ? "+" : ""}{formatNumber(pNet)}
+                                  </span>
+                                  {bb > 0 && pNet !== 0 && (
+                                      <span className={`text-[9px] font-black px-2 py-0.5 rounded-lg mt-1 shadow-sm ${pNet > 0 ? 'bg-green-100 text-green-700' : 'bg-rose-100 text-[#D9114A]'}`}>
+                                          {formatBB(pNet, bb)}
+                                      </span>
+                                  )}
+                              </div>
+                          </div>
+                      )
+                  })}
+              </div>
+          </div>
+
         </div>
-
-        {/* 4. THE HAND TABLE (Action Grid) */}
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            
-            {/* Setup */}
-            {sections.SETUP.length > 0 && (
-                <div className="bg-gray-50 border-b border-gray-200 px-4 py-2 text-[10px] text-gray-500 flex flex-wrap gap-x-4 gap-y-1">
-                    <span className="font-bold uppercase text-gray-400 tracking-wider mr-2">Setup:</span>
-                    {sections.SETUP.map((act: any, i: number) => (
-                        <span key={i}>
-                            <b className={act.actor==="Hero"?"text-blue-600":""}>{act.actor==="Hero"?"Hero":roster.find((r:any)=>r.name===act.actor)?.pos}</b> {act.verb} {formatNumber(act.amount)}
-                        </span>
-                    ))}
-                </div>
-            )}
-
-            <div className="w-full">
-                <StreetHeader title="PREFLOP" />
-                <ActionTable actions={sections.PREFLOP} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
-
-                {sections.FLOP.length > 0 && (
-                    <>
-                        <StreetHeader title="FLOP" cards={flopCards} />
-                        <ActionTable actions={sections.FLOP} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
-                    </>
-                )}
-
-                {(sections.TURN.length > 0 || turnCards.length > 0) && (
-                    <>
-                        <StreetHeader title="TURN" cards={turnCards} />
-                        <ActionTable actions={sections.TURN} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
-                    </>
-                )}
-
-                {(sections.RIVER.length > 0 || riverCards.length > 0) && (
-                    <>
-                        <StreetHeader title="RIVER" cards={riverCards} />
-                        <ActionTable actions={sections.RIVER} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} />
-                    </>
-                )}
-
-                {sections.SHOWDOWN.length > 0 && (
-                    <>
-                        <StreetHeader title="SHOWDOWN" color="bg-yellow-50 border-yellow-100" textColor="text-yellow-700" />
-                        <ActionTable actions={sections.SHOWDOWN} bb={bb} heroName="Hero" roster={roster} heroLabel={heroLabel} isShowdown />
-                    </>
-                )}
-            </div>
-        </div>
-
-        {/* 5. NET RESULT SUMMARY */}
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
-            <div className="bg-gray-900 px-4 py-2">
-                <span className="text-[10px] font-black text-white uppercase tracking-widest">Hand Results</span>
-            </div>
-            <div className="divide-y divide-gray-100">
-                {Object.entries(playerStats).map(([player, stat]: any) => {
-                    if (stat.invested === 0 && stat.collected === 0) return null;
-                    const isHero = player === "Hero";
-                    const pInfo = roster.find((r:any)=>r.name===player);
-                    const pNet = stat.net;
-
-                    return (
-                        <div key={player} className="flex justify-between items-center px-4 py-2 text-sm">
-                            <div className="flex items-center gap-2 w-1/3">
-                                <PositionBadge pos={pInfo?.pos} />
-                                <span className={`font-bold ${isHero ? 'text-blue-600' : 'text-gray-700'}`}>{player}</span>
-                            </div>
-                            <div className="w-1/3 text-center text-xs text-gray-400">
-                                {stat.invested > 0 && `Inv: ${formatNumber(stat.invested)}`}
-                            </div>
-                            <div className="w-1/3 text-right flex flex-col items-end">
-                                <span className={`font-mono font-bold ${pNet > 0 ? 'text-green-600' : pNet < 0 ? 'text-red-600' : 'text-gray-400'}`}>
-                                    {pNet > 0 ? "+" : ""}{formatNumber(pNet)}
-                                </span>
-                                {bb > 0 && pNet !== 0 && (
-                                    <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded mt-0.5 ${pNet > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                                        {formatBB(pNet, bb)}
-                                    </span>
-                                )}
-                            </div>
-                        </div>
-                    )
-                })}
-            </div>
-        </div>
-
       </div>
     </div>
   );
@@ -607,12 +629,12 @@ export default function HandDetailPage() {
 
 // --- TABLE COMPONENTS ---
 
-function StreetHeader({ title, cards, color = "bg-gray-100 border-gray-200", textColor = "text-gray-500" }: any) {
+function StreetHeader({ title, cards, color = "bg-white/40 border-white/50", textColor = "text-gray-400" }: any) {
     return (
-        <div className={`flex items-center justify-between px-4 py-2 border-y ${color}`}>
-            <span className={`text-[10px] font-black uppercase tracking-widest ${textColor}`}>{title}</span>
+        <div className={`flex items-center justify-between px-6 py-2.5 border-y backdrop-blur-sm ${color}`}>
+            <span className={`text-[10px] font-black uppercase tracking-[0.2em] ${textColor}`}>{title}</span>
             {cards && cards.length > 0 && (
-                <div className="flex gap-1">
+                <div className="flex gap-1.5 p-1 bg-white/50 rounded-xl border border-white shadow-sm scale-90 md:scale-100">
                     {cards.map((c: string, i: number) => <Card key={i} card={c} size="md" />)}
                 </div>
             )}
@@ -620,15 +642,14 @@ function StreetHeader({ title, cards, color = "bg-gray-100 border-gray-200", tex
     );
 }
 
-// ✅ ActionTable: ใช้ Margin/Padding ที่คุณถูกใจ (py-1.5)
 function ActionTable({ actions, bb, heroName, roster, heroLabel, isShowdown }: any) {
     if (!actions || actions.length === 0) {
         if (isShowdown) return null;
-        return <div className="px-4 py-2 text-xs italic text-gray-400 bg-white">No actions (Checked through)</div>;
+        return <div className="px-6 py-4 text-xs italic text-gray-300 font-medium bg-white/30 text-center uppercase tracking-widest leading-loose">No actions (Checked through)</div>;
     }
 
     return (
-        <div className="divide-y divide-gray-100 bg-white">
+        <div className="divide-y divide-white/50 bg-white/40">
             {actions.map((act: any, idx: number) => {
                 const isHero = act.actor === heroName;
                 const isFold = act.verb.includes("fold");
@@ -650,11 +671,11 @@ function ActionTable({ actions, bb, heroName, roster, heroLabel, isShowdown }: a
                 }
 
                 return (
-                    <div key={idx} className={`grid grid-cols-[80px_80px_1fr_minmax(60px,auto)] md:grid-cols-[100px_100px_1fr_120px] gap-x-1 gap-y-0 px-3 md:px-4 py-1.5 items-center text-sm ${isHero ? 'bg-blue-50/20' : ''} ${isFold ? 'opacity-40' : ''}`}>
+                    <div key={idx} className={`grid grid-cols-[80px_80px_1fr_minmax(80px,auto)] md:grid-cols-[120px_100px_1fr_140px] gap-x-3 px-4 md:px-6 py-3 items-center text-sm transition-colors hover:bg-white/60 ${isHero ? 'bg-blue-50/20' : ''} ${isFold ? 'opacity-30' : ''}`}>
                         
                         <div className="flex flex-col items-center justify-center overflow-hidden w-full">
                             <PositionBadge pos={posLabel} />
-                            <span className={`text-[9px] font-medium truncate w-full text-center mt-0.5 ${isHero ? "text-blue-600" : "text-gray-400"}`}>
+                            <span className={`text-[10px] font-black truncate w-full text-center mt-1.5 uppercase tracking-tighter ${isHero ? "text-blue-600" : "text-gray-400 font-bold"}`}>
                                 {act.actor}
                             </span>
                         </div>
@@ -665,7 +686,7 @@ function ActionTable({ actions, bb, heroName, roster, heroLabel, isShowdown }: a
 
                         <div className="flex justify-start overflow-x-auto hide-scrollbar">
                             {showCards.length > 0 && (
-                                <div className="flex gap-1.5">
+                                <div className="flex gap-2 p-1.5 bg-white/50 rounded-xl border border-white shadow-sm scale-90 md:scale-100">
                                     {showCards.map((c, i) => <Card key={i} card={c} size="sm" />)}
                                 </div>
                             )}
@@ -674,11 +695,11 @@ function ActionTable({ actions, bb, heroName, roster, heroLabel, isShowdown }: a
                         <div className="text-right flex flex-col items-end">
                             {act.amount > 0 && (
                                 <>
-                                    <span className={`font-mono font-bold text-xs md:text-sm ${isHero ? "text-blue-700" : "text-gray-700"}`}>
+                                    <span className={`font-mono font-black text-sm md:text-base tracking-tighter ${isHero ? "text-blue-700" : "text-gray-800"}`}>
                                         {formatNumber(act.amount)}
                                     </span>
                                     {bb > 0 && (
-                                        <span className={`text-[8px] md:text-[9px] font-bold px-1 rounded bg-gray-100 text-gray-500 mt-0.5 whitespace-nowrap`}>
+                                        <span className={`text-[9px] font-black px-1.5 py-0.5 rounded-lg bg-gray-100/50 text-gray-400 mt-1 uppercase tracking-tighter whitespace-nowrap`}>
                                             {formatBB(act.amount, bb)}
                                         </span>
                                     )}
