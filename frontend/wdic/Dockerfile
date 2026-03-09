@@ -16,7 +16,7 @@ RUN pnpm build
 
 # ---------- runner ----------
 FROM node:20-alpine AS runner
-WORKDIR /appdocke
+WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000

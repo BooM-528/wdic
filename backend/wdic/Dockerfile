@@ -3,16 +3,16 @@ FROM python:3.12-slim
 
 # ตั้งค่า Python ให้ทำงานสะดวกในคอนเทนเนอร์
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    PIP_NO_CACHE_DIR=1
+  PYTHONUNBUFFERED=1 \
+  PIP_NO_CACHE_DIR=1
 
 # โฟลเดอร์ทำงาน
 WORKDIR /app
 
 # ติดตั้ง dependency ของระบบที่มักจำเป็นกับ Postgres/psycopg2
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    libpq-dev \
+  build-essential \
+  libpq-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # ติดตั้ง Python dependencies ล่วงหน้า (ถ้ามี requirements.txt)
@@ -27,6 +27,6 @@ COPY . .
 RUN python manage.py collectstatic --noinput
 
 # Set the command to run the development server
-CMD gunicorn wdic.wsgi:application --bind 0.0.0.0:8000
+CMD gunicorn website.wsgi:application --bind 0.0.0.0:8000
 
 EXPOSE 8000
