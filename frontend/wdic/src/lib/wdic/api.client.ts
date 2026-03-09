@@ -37,6 +37,12 @@ export async function analyzeSession(sessionId: string, force = false, lang = "t
   });
 }
 
+export async function getSessionAnalysis(sessionId: string): Promise<any> {
+  return apiFetch<any>(`/wdic/sessions/${sessionId}/analyze`, {
+    method: "GET"
+  });
+}
+
 export async function importSession(payload: { rawFileText: string; name?: string; source?: string }) {
   return apiFetch<{ sessionId: string; handCount: number; skipped: number; handIds: string[] }>(
     `/wdic/sessions/import`,

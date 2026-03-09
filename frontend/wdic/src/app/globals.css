@@ -370,3 +370,13 @@ button:disabled {
 .animate-pulse-glow {
   animation: pulse-glow 3s infinite ease-in-out alternate;
 }
+
+@keyframes gradient-x {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-x {
+  animation: gradient-x 3s linear infinite;
+}

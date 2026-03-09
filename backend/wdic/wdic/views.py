@@ -482,6 +482,15 @@ class AnalyzeHandView(GuestRequiredAPIView):
 
 
 class AnalyzeSessionView(GuestRequiredAPIView):
+    def get(self, request, session_id: UUID):
+        guest = self.get_guest(request)
+        session = WdicSession.objects.filter(id=session_id, guest=guest).first()
+        if not session:
+            raise Http404
+        if hasattr(session, "analysis"):
+            return Response(SessionAnalysisSerializer(session.analysis).data)
+        return Response({"detail": "No analysis found"}, status=status.HTTP_404_NOT_FOUND)
+
     def post(self, request, session_id: UUID):
         guest = self.get_guest(request)
         session = WdicSession.objects.filter(id=session_id, guest=guest).first()

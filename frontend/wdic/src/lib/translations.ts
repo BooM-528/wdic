@@ -89,7 +89,10 @@ export const translations: Record<string, Record<string, string>> = {
     break_even: "Break Even",
     folded: "Folded",
     no_hands_found: "No hands found",
-    no_hands_found_desc: "Try adjusting your filters to see more results."
+    no_hands_found_desc: "Try adjusting your filters to see more results.",
+    session_ai_insights: "Session AI Insights",
+    session_ai_insights_desc: "Discover big leaks and overall performance",
+    analyze_full_session: "Analyze Full Session"
   },
   th: {
     // Navbar / Common
@@ -181,6 +184,9 @@ export const translations: Record<string, Record<string, string>> = {
     break_even: "เท่าทุน",
     folded: "หมอบ",
     no_hands_found: "ไม่พบข้อมูลแฮนด์",
-    no_hands_found_desc: "ลองปรับฟิลเตอร์เพื่อดูผลลัพธ์อื่น"
+    no_hands_found_desc: "ลองปรับฟิลเตอร์เพื่อดูผลลัพธ์อื่น",
+    session_ai_insights: "การวิเคราะห์ภาพรวมโดย AI",
+    session_ai_insights_desc: "ค้นหาจุดบกพร่องและสรุปผลการเล่นทั้งเซสชั่น",
+    analyze_full_session: "วิเคราะห์ทั้งเซสชั่น"
   }
 };

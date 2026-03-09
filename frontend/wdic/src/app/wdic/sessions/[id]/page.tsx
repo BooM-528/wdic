@@ -3,7 +3,8 @@
 import React, { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { getSessionHands, analyzeSession } from "@/lib/wdic/api.client";
+import { getSessionHands, analyzeSession, getSessionAnalysis } from "@/lib/wdic/api.client";
+import ReactMarkdown from "react-markdown";
 import { getGuestId } from "@/lib/guest.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -163,9 +164,9 @@ export default function WdicSessionDetailPage() {
         }); 
         setData(res as unknown as PageData);
 
-        // Try to fetch existing session analysis silently
+        // Try to fetch existing session analysis silently WITHOUT triggering AI
         try {
-            const analysisRes = await analyzeSession(sessionId, false, language);
+            const analysisRes = await getSessionAnalysis(sessionId);
             if (analysisRes && analysisRes.content) {
                 setSessionAnalysis(analysisRes);
             }
@@ -317,7 +318,7 @@ export default function WdicSessionDetailPage() {
                             {formatDate(session.started_at || session.created_at)}
                         </span>
                     </div>
-                    <h1 className="text-2xl md:text-5xl font-black text-gray-900 tracking-tighter leading-tight mb-6">
+                    <h1 className="text-3xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-br from-gray-900 via-gray-800 to-gray-600 tracking-tighter leading-tight mb-8">
                         {session.name || t("poker_session")}
                     </h1>
                     
@@ -384,72 +385,107 @@ export default function WdicSessionDetailPage() {
             </div>
         </div>
 
-        {/* AI Session Analysis Section */}
-        <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden mb-8 group">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center text-white shadow-lg shadow-gray-200 rotate-3 group-hover:rotate-0 transition-transform">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
-                    </div>
-                    <div>
-                      <span className="block text-sm font-black text-gray-900 uppercase tracking-[0.2em]">{t("session_ai_insights") || "Session AI Insights"}</span>
-                      <span className="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">{t("session_ai_insights_desc") || "Discover big leaks and overall performance"}</span>
-                    </div>
-                </div>
-                
-                <div>
-                  {sessionAnalysis ? (
-                      <button 
-                          onClick={() => handleAnalyzeSession(true)}
-                          disabled={analyzingSession}
-                          className={`px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border
-                              ${analyzingSession 
-                                  ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
-                                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900 active:scale-95 shadow-sm'
-                              }
-                          `}
-                      >
-                          {analyzingSession ? t("updating") : t("re_analyze")}
-                      </button>
-                  ) : (
-                      <button 
-                          onClick={() => handleAnalyzeSession(false)}
-                          disabled={analyzingSession}
-                          className={`group/btn relative px-8 py-3.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all
-                              ${analyzingSession 
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed' 
-                                  : 'bg-gray-900 text-white hover:bg-[#D9114A] hover:shadow-xl hover:shadow-rose-100 active:scale-95'
-                              }
-                          `}
-                      >
-                          {analyzingSession ? (
-                              <div className="flex items-center gap-2">
-                                  <svg className="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                                  {t("loading")}
-                              </div>
-                          ) : t("analyze_full_session") || "✨ Analyze Full Session"}
-                      </button>
-                  )}
-                </div>
-            </div>
+        {/* AI Session Analysis Section (Enhanced Strike) */}
+        <div className="bg-white/90 backdrop-blur-2xl rounded-[2.5rem] p-1 md:p-1.5 border border-white shadow-[0_25px_60px_rgba(0,0,0,0.05)] relative overflow-hidden mb-12">
+            
+            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-indigo-100/40 via-rose-100/30 to-blue-100/40 blur-3xl -translate-y-40 translate-x-40 pointer-events-none opacity-50"></div>
 
-            {sessionAnalysis && (
-                <div className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-medium selection:bg-rose-100 bg-white/50 p-6 md:p-10 rounded-[2rem] border border-white mt-8 shadow-[inset_0_2px_10px_rgba(0,0,0,0.02)]">
-                    {sessionAnalysis.content}
-                    <div className="mt-6 pt-4 border-t border-gray-200/50 flex items-center justify-between">
-                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-widest italic flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                            {sessionAnalysis.model_name}
+            <div className="bg-gradient-to-r from-gray-50/50 via-white to-gray-50/50 rounded-[2.3rem] p-8 md:p-12 relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-10">
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-[1.5rem] bg-gray-900 flex items-center justify-center text-white shadow-[0_15px_30px_rgba(0,0,0,0.2)] rotate-3">
+                            <svg className="w-8 h-8" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
+                            {t("session_ai_insights")}
+                          </h2>
+                          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest leading-relaxed opacity-80">
+                            {t("session_ai_insights_desc")}
+                          </p>
                         </div>
                     </div>
+                    
+                    <div className="w-full md:w-auto">
+                      {sessionAnalysis ? (
+                          <button 
+                              onClick={() => handleAnalyzeSession(true)}
+                              disabled={analyzingSession}
+                              className={`w-full md:w-auto px-8 py-4 rounded-2xl text-[12px] font-black uppercase tracking-widest transition-all border flex items-center justify-center gap-3 group
+                                  ${analyzingSession 
+                                      ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                                      : 'bg-white text-gray-600 border-gray-200 hover:border-gray-900 hover:text-gray-900 active:scale-95 shadow-sm'
+                                  }
+                              `}
+                          >
+                              {analyzingSession ? (
+                                <svg className="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                              ) : (
+                                <svg className="group-hover:rotate-180 transition-transform duration-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg>
+                              )}
+                              {analyzingSession ? t("updating") : t("re_analyze")}
+                          </button>
+                      ) : (
+                          <button 
+                              onClick={() => handleAnalyzeSession(false)}
+                              disabled={analyzingSession}
+                              className={`group/btn relative px-12 py-5 rounded-3xl text-[13px] font-black uppercase tracking-[0.25em] transition-all overflow-hidden shadow-[0_15px_40px_rgba(217,17,74,0.15)] w-full md:w-auto
+                                  ${analyzingSession 
+                                      ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' 
+                                      : 'bg-gray-900 text-white hover:bg-[#D9114A] active:scale-95'
+                                  }
+                              `}
+                          >
+                              {/* Animated gradient layer - Always slightly visible to encourage clicks */}
+                              {!analyzingSession && (
+                                <div className="absolute inset-0 bg-gradient-to-r from-[#D9114A] via-[#FF4D80] to-[#D9114A] opacity-10 group-hover/btn:opacity-100 transition-opacity duration-500 bg-[length:200%_100%] animate-gradient-x"></div>
+                              )}
+
+                              <div className="relative z-10 flex items-center justify-center gap-4">
+                                  {analyzingSession ? (
+                                      <>
+                                          <svg className="animate-spin" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
+                                          {t("loading")}
+                                      </>
+                                  ) : (
+                                    <>
+                                      <span className="drop-shadow-sm">{t("analyze_full_session")}</span>
+                                      <svg className="group-hover/btn:scale-125 group-hover/btn:rotate-12 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                    </>
+                                  )}
+                              </div>
+                          </button>
+                      )}
+                    </div>
                 </div>
-            )}
+
+                {sessionAnalysis && (
+                    <div className="prose prose-sm md:prose-base max-w-none text-gray-700 leading-relaxed bg-white/60 p-8 md:p-12 rounded-[2.5rem] border border-white mt-12 shadow-[inset_0_2px_15px_rgba(0,0,0,0.01)] transition-all duration-700">
+                        <ReactMarkdown 
+                            components={{
+                                h1: ({node, ref, ...props}) => <h1 className="text-2xl font-black text-gray-900 mb-6 mt-8 first:mt-0 tracking-tight" {...props} />,
+                                h2: ({node, ref, ...props}) => <h2 className="text-xl font-black text-gray-900 mb-4 mt-8 first:mt-0 tracking-tight" {...props} />,
+                                h3: ({node, ref, ...props}) => <h3 className="text-lg font-black text-gray-900 mb-3 mt-6 first:mt-0 tracking-tight" {...props} />,
+                                p: ({node, ref, ...props}) => <p className="mb-4 last:mb-0" {...props} />,
+                                ul: ({node, ref, ...props}) => <ul className="list-none space-y-3 mb-6" {...props} />,
+                                li: ({node, ref, ...props}) => (
+                                    <li className="flex gap-3 items-start group/li" {...props}>
+                                        <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#D9114A] flex-shrink-0 group-hover/li:scale-125 transition-transform"></span>
+                                        <span>{props.children}</span>
+                                    </li>
+                                ),
+                                strong: ({node, ref, ...props}) => <strong className="font-black text-gray-900" {...props} />,
+                                blockquote: ({node, ref, ...props}) => <blockquote className="border-l-4 border-[#D9114A] pl-6 py-2 my-6 italic text-gray-600 bg-rose-50/30 rounded-r-2xl" {...props} />,
+                            }}
+                        >
+                            {sessionAnalysis.content}
+                        </ReactMarkdown>
+                    </div>
+                )}
+            </div>
         </div>
 
-        {/* --- Conditional Render: Show Hands only if Session is Analyzed --- */}
-        {sessionAnalysis ? (
-        <>
-            {/* Filter Bar */}
+        {/* Filter Bar */}
         <div className="sticky top-4 z-30 mb-6 bg-white/70 backdrop-blur-xl border border-white shadow-[0_4px_20px_rgba(0,0,0,0.04)] rounded-2xl p-2.5">
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
                 <div className="flex items-center gap-3 px-2 hidden lg:flex">
@@ -654,9 +690,17 @@ export default function WdicSessionDetailPage() {
                             </div>
                         )}
                         
-                        {/* Interactive element - arrow pointing right */}
-                        <div className="text-gray-300 group-hover:text-blue-500 transition-colors mt-2 hidden md:block">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                        {/* AI Action Button */}
+                        <div className="mt-3 hidden md:block">
+                            <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-[10px] font-black uppercase tracking-widest transition-all
+                                ${h.has_analysis 
+                                    ? 'bg-blue-50 border-blue-100 text-blue-600' 
+                                    : 'bg-white border-gray-100 text-gray-400 group-hover:border-gray-900 group-hover:text-gray-900 shadow-sm'
+                                }
+                            `}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                {h.has_analysis ? "Analyzed" : "AI Review"}
+                            </div>
                         </div>
                     </div>
                   
@@ -674,43 +718,6 @@ export default function WdicSessionDetailPage() {
               </div>
           )}
         </div>
-        </>
-        ) : (
-            <div className="flex flex-col items-center justify-center py-20 px-4 mt-8 bg-white/50 backdrop-blur-md rounded-[3rem] border border-white shadow-sm text-center">
-                <div className="w-24 h-24 bg-gradient-to-br from-indigo-50 to-rose-50 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white">
-                    <span className="text-4xl">✨</span>
-                </div>
-                <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-3">
-                    Unlock AI Session Insights
-                </h2>
-                <p className="text-gray-500 font-medium max-w-md mx-auto mb-8 leading-relaxed">
-                    Analyze this session to uncover major leaks, review significant chip swings, and get personalized advice before diving into individual hands.
-                </p>
-                <button 
-                    onClick={() => handleAnalyzeSession(false)}
-                    disabled={analyzingSession}
-                    className={`group relative px-10 py-4 rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-[0_8px_30px_rgba(217,17,74,0.2)]
-                        ${analyzingSession 
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none' 
-                            : 'bg-[#D9114A] text-white hover:bg-[#E61A54] hover:shadow-[0_12px_40px_rgba(217,17,74,0.3)] active:scale-95'
-                        }
-                    `}
-                >
-                    {analyzingSession ? (
-                        <div className="flex items-center gap-3">
-                            <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="M21 12a9 9 0 1 1-6.219-8.56" /></svg>
-                            {t("loading")}
-                        </div>
-                    ) : (
-                        <span className="flex items-center gap-2">
-                           {t("analyze_full_session") || "Analyze Full Session"}
-                           <svg className="group-hover:translate-x-1 transition-transform" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                        </span>
-                    )}
-                </button>
-            </div>
-        )}
-
       </div>
     </div>
   );
