@@ -143,7 +143,7 @@ export default function WdicSessionDetailPage() {
   const [apiRecommended, setApiRecommended] = useState<boolean>(false);
 
   // Local Filter States
-  const [filterType, setFilterType] = useState<'all' | 'won' | 'lost'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'won' | 'lost' | 'folded'>('all');
   const [hideFolds, setHideFolds] = useState(false);
 
   useEffect(() => {
@@ -171,7 +171,6 @@ export default function WdicSessionDetailPage() {
 
   // --- Calculations ---
   let totalProfit = 0;
-  let totalBBProfit = 0;
   let grossProfit = 0;
   let maxWin = 0;
   let maxLoss = 0;
@@ -195,14 +194,9 @@ export default function WdicSessionDetailPage() {
   (data?.hands || []).forEach(h => {
     const collected = Number(h.hero_collected || 0);
     const invested = Number(h.hero_invested || 0);
-    const bb = Number(h.bb_value || 0);
     const net = collected - invested;
 
     totalProfit += net;
-    
-    if (bb > 0) {
-        totalBBProfit += (net / bb);
-    }
     
     if (net > 0) {
         grossProfit += net;
@@ -221,13 +215,21 @@ export default function WdicSessionDetailPage() {
         const ante = Number(h.ante || 0);
         const net = collected - invested;
 
-        if (filterType === 'won' && net <= 0) return false;
-        if (filterType === 'lost' && net >= 0) return false;
-
-        if (hideFolds) {
-             const voluntaryInvested = invested - ante;
-             if (voluntaryInvested <= 0 && collected === 0) return false;
+        let forcedInvestment = ante;
+        if (h.hero_position === 'SB') {
+            forcedInvestment += Number(h.bb_value || 0) / 2;
+        } else if (h.hero_position === 'BB') {
+            forcedInvestment += Number(h.bb_value || 0);
         }
+        
+        const voluntaryInvested = invested - forcedInvestment;
+        const isFold = (voluntaryInvested <= 0.1 && collected === 0) && net <= 0;
+
+        if (filterType === 'won' && net <= 0) return false;
+        if (filterType === 'lost' && (net >= 0 || isFold)) return false;
+        if (filterType === 'folded' && !isFold) return false;
+
+        if (hideFolds && isFold) return false;
 
         return true;
     });
@@ -406,7 +408,7 @@ export default function WdicSessionDetailPage() {
 
                     {/* Local Filters */}
                     <div className="flex bg-gray-100/50 p-1 rounded-xl flex-shrink-0 border border-gray-200/50">
-                        {(['all', 'won', 'lost'] as const).map((type) => (
+                        {(['all', 'won', 'lost', 'folded'] as const).map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setFilterType(type)}
@@ -450,8 +452,18 @@ export default function WdicSessionDetailPage() {
              const netProfit = collected - invested;
              
              const isWin = netProfit > 0;
-             const isLoss = netProfit < 0;
              const isBreakEven = netProfit === 0 && invested > 0;
+             
+             const ante = Number(h.ante || 0);
+             let forcedInvestment = ante;
+             if (h.hero_position === 'SB') {
+                 forcedInvestment += Number(h.bb_value || 0) / 2;
+             } else if (h.hero_position === 'BB') {
+                 forcedInvestment += Number(h.bb_value || 0);
+             }
+             const voluntaryInvested = invested - forcedInvestment;
+             const isFold = (voluntaryInvested <= 0.1 && collected === 0) && netProfit <= 0;
+             const isLoss = netProfit < 0 && !isFold;
 
              const bbText = bb > 0 ? formatBB(netProfit, bb) : "";
 
@@ -466,7 +478,7 @@ export default function WdicSessionDetailPage() {
                     
                     {/* Left: Hand# & Date Info */}
                     <div className="flex items-center gap-4 md:w-[180px] flex-shrink-0">
-                        <div className={`flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all shadow-sm flex-shrink-0 ${isWin ? 'bg-gradient-to-br from-green-50 to-emerald-100 text-green-700' : isLoss ? 'bg-gradient-to-br from-gray-50 to-gray-100 text-gray-400 group-hover:from-red-50 group-hover:to-rose-100 group-hover:text-[#D9114A]' : 'bg-gray-50 text-gray-400'} relative`}>
+                        <div className={`flex flex-col items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-2xl transition-all shadow-sm flex-shrink-0 ${isWin ? 'bg-gradient-to-br from-green-50 to-emerald-100 text-green-700' : isLoss ? 'bg-gradient-to-br from-red-50 to-rose-100 text-[#D9114A]' : 'bg-gray-50 text-gray-400 group-hover:from-gray-100 group-hover:to-gray-200'} relative`}>
                             {h.is_recommended && (
                                 <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-amber-400 rounded-full flex items-center justify-center text-white shadow-md z-20 animate-bounce">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -537,8 +549,15 @@ export default function WdicSessionDetailPage() {
                             </>
                         ) : (
                             <div className="opacity-60 text-right w-full flex flex-col items-end">
-                                <span className="text-xl md:text-2xl font-black text-gray-400 tracking-tighter mt-1">-</span>
-                                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md mt-1">{t("folded")}</span>
+                                <span className={`text-xl md:text-2xl font-black tracking-tighter mt-1 ${netProfit < 0 ? 'text-gray-500' : 'text-gray-400'}`}>
+                                    {netProfit < 0 ? netProfit.toLocaleString() : '-'}
+                                </span>
+                                {netProfit < 0 && bbText && (
+                                    <span className="text-[10px] md:text-xs font-black text-gray-500 uppercase tracking-widest mt-0.5 bg-gray-100 px-2 py-0.5 rounded-md">
+                                        ({bbText})
+                                    </span>
+                                )}
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest bg-gray-100 px-2 py-0.5 rounded-md mt-1">{t("folded")}</span>
                             </div>
                         )}
                         
