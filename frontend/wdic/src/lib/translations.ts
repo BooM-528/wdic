@@ -8,6 +8,8 @@ export const translations: Record<string, Record<string, string>> = {
     back_to_session: "Back to Session",
     refresh: "Refresh",
     loading: "Loading...",
+    loading_hand_data: "Loading technical data...",
+    score: "Score",
     
     // Home Page
     hero_badge: "Poker Analytics Platform ♠️♥️",
@@ -97,6 +99,8 @@ export const translations: Record<string, Record<string, string>> = {
     back_to_session: "กลับไปที่เซสชั่น",
     refresh: "รีเฟรช",
     loading: "กำลังโหลด...",
+    loading_hand_data: "กำลังประมวลผลข้อมูลเทคนิค...",
+    score: "คะแนน",
 
     // Home Page
     hero_badge: "แพลตฟอร์มวิเคราะห์โป๊กเกอร์ ♠️♥️",

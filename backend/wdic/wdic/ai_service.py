@@ -40,10 +40,12 @@ class PokerAiService:
             response = model.generate_content(prompt)
             result = json.loads(response.text)
 
-            # Extract structured data
+            # Extract structured data with new technical metrics
             return {
                 "content": result.get("analysis_markdown", "No analysis provided."),
                 "suggestion": result.get("suggestion", "NEUTRAL"),
+                "score": result.get("score", 0),
+                "key_mistakes": result.get("key_mistakes", []),
                 "model_name": self.model_name,
                 "tokens_used": (
                     response.usage_metadata.total_token_count
@@ -60,13 +62,14 @@ class PokerAiService:
         self, hand: WdicHand, data: Dict[str, Any], raw_text: str, lang: str
     ) -> str:
         lang_instruction = (
-            "Respond in THAI language."
+            "Analyze and respond in THAI language."
             if lang == "th"
-            else "Respond in ENGLISH language."
+            else "Analyze and respond in ENGLISH language."
         )
 
         prompt = f"""
-You are a professional high-stakes poker coach. Analyze the following hand history for the player 'HERO'.
+You are a world-class GTO (Game Theory Optimal) Poker Coach. 
+Your goal is to perform a rigorous technical analysis of the following hand to find **leaks** (mistakes) in the player's ('HERO') strategy.
 
 {lang_instruction}
 
@@ -81,19 +84,23 @@ ADDITIONAL CONTEXT:
 - Hero Collected: {hand.hero_collected}
 
 INSTRUCTIONS:
-1. Provide a detailed strategic analysis in Markdown format.
-2. IMPORTANT: when mentioning cards or suits, use the following symbols for readability:
-   - s -> ♠ (Spades)
-   - h -> ♥ (Hearts)
-   - d -> ♦ (Diamonds)
-   - c -> ♣ (Clubs)
-   Example: [As Qd] should be written as A♠ Q♦. Use these symbols throughout the analysis_markdown.
-3. IMPORTANT: Use table positions (e.g. BTN, SB, BB, UTG, CO, etc.) to refer to players rather than using their screen names or IDs.
-4. Evaluate if the play was overall good, a blunder, or missed value.
-5. Return the response in the following JSON format:
+1. **Be Critical**: Do not be afraid to call out bad plays. If a move was a "Blunder" (high EV loss) or "Missed Value", explain clearly why.
+2. **Technical Depth**: Was the pre-flop range correct for {hand.hero_position}? Did the bet sizing reflect the board texture and SPR?
+3. **Format with Markdown**:
+   - Use **### Summary** for a quick overview.
+   - Use **### Street-by-Street** for detailed logic.
+   - Use **### The Big Mistake** to highlight the most critical error (if any).
+   - Use **### Lesson for Next Time** for actionable advice.
+4. **Symbols**: Use ♠, ♥, ♦, ♣ for suits (e.g., A♠ K♥, 10♦ 7♣).
+5. **No Screen Names**: Always use table positions (BTN, SB, BB, UTG, CO, etc.) to refer to players.
+6. **Card Formatting**: Use the format [A♠ K♥] or just A♠ K♥. Use these symbols throughout the analysis_markdown.
+
+Return the response in the following JSON format:
 {{
-  "analysis_markdown": "Your detailed analysis here...",
-  "suggestion": "ONE_OF: GOOD_PLAY, BLUNDER, MISSED_VALUE, TRICKY_SPOT, NEUTRAL"
+  "analysis_markdown": "Your technical analysis here...",
+  "suggestion": "GOOD_PLAY | BLUNDER | MISSED_VALUE | TRICKY_SPOT | NEUTRAL",
+  "score": (A numerical score from 0-100 based on how well Hero played, 100 being perfect GTO),
+  "key_mistakes": ["Short summary of mistake 1", "Short summary of mistake 2"]
 }}
 """
         return prompt
@@ -107,14 +114,14 @@ INSTRUCTIONS:
 ### AI Analysis for Hand #{hand.hand_no} (Mock)
 
 **Overall Impression**: 
-This was a standard play from {hand.hero_position}. You followed basic GTO principles for opening ranges.
+This was a standard play from {hand.hero_position}. You followed basic opening ranges.
 
 **Street Breakdown**:
-- **Pre-flop**: Your open with {hand.hero_cards_str} is within the top 15% of hands, appropriate for your position.
-- **Post-flop**: Without more specific data on opponent tendencies, your sizing seems balanced.
+- **Pre-flop**: Your open with {hand.hero_cards_str} is standard for your position.
+- **Post-flop**: Sizing seems reasonable based on the board.
 
-**Strategic Tip**: 
-Pay attention to the SPR (Stack-to-Pot Ratio) on the turn to avoid committing yourself with marginal hands.
+**Lesson for Next Time**:
+Review your defending ranges from the blinds against aggressive late-position openers.
 {error_msg}
 
 ---
@@ -123,6 +130,10 @@ Pay attention to the SPR (Stack-to-Pot Ratio) on the turn to avoid committing yo
         return {
             "content": content.strip(),
             "suggestion": "NEUTRAL",
+            "score": 0,
+            "key_mistakes": [
+                "Unable to perform technical analysis due to connection issue."
+            ],
             "model_name": f"{self.model_name} (mock)",
             "tokens_used": 0,
         }

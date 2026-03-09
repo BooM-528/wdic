@@ -223,7 +223,18 @@ export default function WdicSessionDetailPage() {
 
 
   if (error) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-[#D9114A] font-black tracking-widest text-xl">{error}</div>;
-  if (!data || loading) return <div className="min-h-screen flex items-center justify-center p-12 text-center text-gray-400 font-bold tracking-widest animate-pulse">{t("loading")}</div>;
+  if (!data || loading) return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FA]">
+          <div className="relative w-20 h-20">
+              <div className="absolute inset-0 rounded-full border-4 border-gray-100"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#D9114A] animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-rose-100/50 animate-ping"></div>
+          </div>
+          <span className="mt-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] animate-pulse">
+              {t("loading")}
+          </span>
+      </div>
+  );
 
   return (
     <div className="relative min-h-screen bg-[#F8F9FA] text-gray-800 font-sans selection:bg-[#D9114A]/20 pb-20 overflow-hidden">

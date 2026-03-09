@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ArnisongK',
-  description: 'ArnisongK',
+  title: 'WDIC',
+  description: 'WDIC',
   openGraph: {
-    title: 'ArnisongK',
-    description: 'ArnisongK',
-    url: 'https://arnisongk.com',
-    siteName: 'arnisongk',
+    title: 'WDIC',
+    description: 'WDIC',
+    url: 'https://wdic.arnisongk.com',
+    siteName: 'WDIC',
     type: 'website',
   },
 };

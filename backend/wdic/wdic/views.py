@@ -65,7 +65,7 @@ class HandListSerializer(serializers.ModelSerializer):
 class HandAnalysisSerializer(serializers.ModelSerializer):
     class Meta:
         model = WdicHandAnalysis
-        fields = ["id", "hand_id", "content", "suggestion", "model_name", "prompt_version", "tokens_used", "created_at"]
+        fields = ["id", "hand_id", "content", "suggestion", "score", "key_mistakes", "model_name", "prompt_version", "tokens_used", "created_at"]
 
 class HandDetailSerializer(serializers.ModelSerializer):
     ante = serializers.SerializerMethodField()
@@ -285,6 +285,8 @@ class AnalyzeHandView(GuestRequiredAPIView):
                 hand=hand,
                 content=result["content"],
                 suggestion=result["suggestion"],
+                score=result.get("score", 0),
+                key_mistakes=result.get("key_mistakes", []),
                 model_name=result["model_name"],
                 prompt_version="v1",
                 tokens_used=result["tokens_used"]

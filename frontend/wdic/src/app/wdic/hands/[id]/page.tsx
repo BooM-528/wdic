@@ -381,7 +381,18 @@ export default function HandDetailPage() {
       return calculateAllPlayersNet(roster, data.actions_json?.actions || [], data.actions_json?.winners || []);
   }, [data, roster]);
 
-  if (loading || !data) return <div className="p-12 text-center text-gray-400 font-bold animate-pulse">{t("loading")}</div>;
+  if (loading || !data) return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F8F9FA]">
+          <div className="relative w-24 h-24">
+              <div className="absolute inset-0 rounded-full border-4 border-gray-100"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-t-[#D9114A] animate-spin"></div>
+              <div className="absolute inset-2 rounded-full border-4 border-rose-100/50 animate-ping"></div>
+          </div>
+          <span className="mt-8 text-[10px] font-black text-gray-400 uppercase tracking-[0.3em] animate-pulse">
+              {t("loading_hand_data")}
+          </span>
+      </div>
+  );
 
   const {
     hand_no, hero_cards_str, hero_collected, hero_invested,
@@ -663,20 +674,59 @@ export default function HandDetailPage() {
 
                   {data.analysis ? (
                       <div className="p-8 md:p-12">
-                          <div className="flex items-center gap-4 mb-10">
-                              <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm
-                                  ${data.analysis.suggestion === 'GOOD_PLAY' ? 'bg-green-50 text-green-700 border-green-100' : 'bg-blue-50 text-blue-700 border-blue-100'}
-                              `}>
-                                  {data.analysis.suggestion?.replace('_', ' ')}
+                          <div className="flex flex-col md:flex-row md:items-center gap-8 mb-12">
+                              {/* Score Meter */}
+                              <div className="relative w-32 h-32 flex-shrink-0 mx-auto md:mx-0">
+                                  <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                                      <circle cx="50" cy="50" r="42" fill="transparent" stroke="currentColor" strokeWidth="8" className="text-gray-100" />
+                                      <circle 
+                                          cx="50" cy="50" r="42" 
+                                          fill="transparent" 
+                                          stroke="currentColor" 
+                                          strokeWidth="8" 
+                                          strokeDasharray={264} 
+                                          strokeDashoffset={264 - (264 * (data.analysis.score || 0)) / 100} 
+                                          className={`${(data.analysis.score || 0) >= 80 ? 'text-green-500' : (data.analysis.score || 0) >= 50 ? 'text-blue-500' : 'text-[#D9114A]'} transition-all duration-1000 ease-out`}
+                                          strokeLinecap="round"
+                                      />
+                                  </svg>
+                                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                      <span className="text-3xl font-black text-gray-900 tracking-tighter">{data.analysis.score || 0}</span>
+                                      <span className="text-[8px] font-black text-gray-400 uppercase tracking-widest">{t("score")}</span>
+                                  </div>
                               </div>
-                              <div className="h-px flex-1 bg-gradient-to-r from-gray-100 to-transparent"></div>
-                              <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic flex items-center gap-2">
-                                  <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
-                                  {data.analysis.model_name}
+
+                              <div className="flex-1 space-y-4">
+                                  <div className="flex items-center gap-4">
+                                      <div className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border shadow-sm
+                                          ${data.analysis.suggestion === 'GOOD_PLAY' ? 'bg-green-50 text-green-700 border-green-100' : 
+                                            data.analysis.suggestion === 'BLUNDER' ? 'bg-rose-50 text-[#D9114A] border-rose-100' :
+                                            'bg-blue-50 text-blue-700 border-blue-100'}
+                                      `}>
+                                          {data.analysis.suggestion?.replace('_', ' ')}
+                                      </div>
+                                      <div className="h-px flex-1 bg-gradient-to-r from-gray-100 to-transparent"></div>
+                                      <div className="text-[10px] font-bold text-gray-300 uppercase tracking-widest italic flex items-center gap-2">
+                                          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></svg>
+                                          {data.analysis.model_name}
+                                      </div>
+                                  </div>
+
+                                  {/* Key Mistakes Tags */}
+                                  {data.analysis.key_mistakes && data.analysis.key_mistakes.length > 0 && (
+                                      <div className="flex flex-wrap gap-2">
+                                          {data.analysis.key_mistakes.map((m: string, i: number) => (
+                                              <span key={i} className="px-3 py-1.5 bg-gray-50 text-gray-600 text-[10px] font-black uppercase tracking-wider rounded-xl border border-gray-100 shadow-sm flex items-center gap-2">
+                                                  <span className="w-1 h-1 rounded-full bg-[#D9114A]"></span>
+                                                  {m}
+                                              </span>
+                                          ))}
+                                      </div>
+                                  )}
                               </div>
                           </div>
                           
-                          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-medium selection:bg-rose-100">
+                          <div className="prose prose-sm max-w-none text-gray-700 leading-relaxed whitespace-pre-line font-medium selection:bg-rose-100 bg-white/40 p-6 md:p-10 rounded-[2rem] border border-white">
                               {data.analysis.content}
                           </div>
                       </div>

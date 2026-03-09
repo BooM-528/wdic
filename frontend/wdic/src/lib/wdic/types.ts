@@ -26,6 +26,8 @@ export type WdicHandAnalysis = {
   hand_id: string;
   content: string;
   suggestion: string | null;
+  score: number;
+  key_mistakes: string[];
   model_name: string;
   prompt_version: string;
   tokens_used: number;

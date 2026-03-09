@@ -71,6 +71,8 @@ class WdicHandAnalysis(models.Model):
     # AI Output
     content = models.TextField(help_text="Markdown format analysis content")
     suggestion = models.CharField(max_length=64, blank=True, null=True, help_text="Summary: e.g., FOLD_PREFLOP, GOOD_CALL")
+    score = models.IntegerField(default=0, help_text="Player's performance score (0-100)")
+    key_mistakes = models.JSONField(default=list, blank=True, help_text="List of technical errors identified")
     
     # Metadata
     model_name = models.CharField(max_length=64, default="gpt-4o")
