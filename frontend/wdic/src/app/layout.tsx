@@ -12,6 +12,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { Anuphan } from "next/font/google";
+const anuphan = Anuphan({
+  variable: "--font-anuphan",
+  subsets: ["thai", "latin"],
+});
+
+
 export const metadata: Metadata = {
   title: 'WDIC',
   description: 'WDIC',
@@ -34,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${anuphan.variable} antialiased`}
       >
         <LanguageProvider>
           {children}
