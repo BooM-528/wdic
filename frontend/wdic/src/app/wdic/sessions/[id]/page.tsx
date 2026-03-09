@@ -271,8 +271,8 @@ export default function WdicSessionDetailPage() {
                   </div>
                   <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_dashboard")}</span>
               </Link>
-              <LanguageSwitcher />
             </div>
+            <LanguageSwitcher />
         </div>
 
         {/* Session Header Card (Glassmorphism) */}

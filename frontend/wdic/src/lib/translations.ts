@@ -10,7 +10,7 @@ export const translations: Record<string, Record<string, string>> = {
     loading: "Loading...",
     loading_hand_data: "Loading technical data...",
     score: "Score",
-    
+
     // Home Page
     hero_badge: "Poker Analytics Platform ♠️♥️",
     hero_title_part1: "Stop Calling Without Reason",
@@ -19,7 +19,7 @@ export const translations: Record<string, Record<string, string>> = {
     hero_subtitle: "Import Hand History from Natural8 or your favorite platforms to find leaks, improve Win-Rate, and become a sharper player.",
     start_free: "Start for Free",
     view_demo: "View Demo Dashboard",
-    
+
     features_title: "Core Features to Change Your Game",
     features_subtitle: "Our app is designed for players who want to seriously improve.",
     feature1_title: "Easy History Import",
@@ -28,7 +28,7 @@ export const translations: Record<string, Record<string, string>> = {
     feature2_desc: "Summary of Win/Loss, graphs, and win rates per position.",
     feature3_title: "Leak System Search",
     feature3_desc: "Highlights your common Call or Fold mistakes for improvement.",
-    
+
     how_it_works: "How It Works",
     step1_title: "Upload",
     step1_desc: "Download Hand History and drag it into the system.",
@@ -36,7 +36,7 @@ export const translations: Record<string, Record<string, string>> = {
     step2_desc: "Processes thousands of hands in seconds.",
     step3_title: "Improve",
     step3_desc: "Check leaks, dive deep into hands, and crush opponents!",
-    
+
     // WDIC / Dashboard Page
     hand_history_analytics: "Hand History Analytics Dashboard",
     platform: "Platform",
@@ -50,7 +50,7 @@ export const translations: Record<string, Record<string, string>> = {
     no_history_title: "No Analysis History Yet",
     no_history_desc: "Upload a Natural8 .txt file to start finding your leaks.",
     hands_played: "Hands Played",
-    
+
     // Hand Detail
     hand_no: "Hand",
     you_won: "You Won",
@@ -66,31 +66,31 @@ export const translations: Record<string, Record<string, string>> = {
     no_analysis_desc: "Click the button above to unlock institutional-grade strategic advice.",
     table_roster: "Table Roster",
     blinds: "Blinds",
-     hero: "Hero",
-     board: "Board",
-     
-     // Session Detail
-     back_to_dashboard: "Back to Dashboard",
-     poker_session: "Poker Session",
-     duration: "Duration",
-     hour_short: "h",
-     minute_short: "m",
-     biggest_win: "Biggest Win",
-     biggest_loss: "Biggest Loss",
-     total_won: "Total Won",
-     net_result: "Net Result",
-     hand_history: "Hand History",
-     filter_all: "All",
-     filter_won: "Won",
-     filter_lost: "Lost",
-     filter_folded: "Folded",
-     hide_folds: "Hide Folds",
-     hand_short: "Hand",
-     break_even: "Break Even",
-     folded: "Folded",
-     no_hands_found: "No hands found",
-     no_hands_found_desc: "Try adjusting your filters to see more results."
-   },
+    hero: "Hero",
+    board: "Board",
+
+    // Session Detail
+    back_to_dashboard: "Back to Dashboard",
+    poker_session: "Poker Session",
+    duration: "Duration",
+    hour_short: "h",
+    minute_short: "m",
+    biggest_win: "Biggest Win",
+    biggest_loss: "Biggest Loss",
+    total_won: "Total Won",
+    net_result: "Net Result",
+    hand_history: "Hand History",
+    filter_all: "All",
+    filter_won: "Won",
+    filter_lost: "Lost",
+    filter_folded: "Folded",
+    hide_folds: "Hide Folds",
+    hand_short: "Hand",
+    break_even: "Break Even",
+    folded: "Folded",
+    no_hands_found: "No hands found",
+    no_hands_found_desc: "Try adjusting your filters to see more results."
+  },
   th: {
     // Navbar / Common
     brand_name: "WHY DID I CALL",
@@ -161,26 +161,26 @@ export const translations: Record<string, Record<string, string>> = {
     hero: "ฮีโร่",
     board: "บอร์ด",
 
-     // Session Detail
-     back_to_dashboard: "กลับไปที่แดชบอร์ด",
-     poker_session: "เซสชั่นโป๊กเกอร์",
-     duration: "ระยะเวลา",
-     hour_short: "ชม.",
-     minute_short: "น.",
-     biggest_win: "ชนะสูงสุด",
-     biggest_loss: "แพ้สูงสุด",
-     total_won: "รวมชนะ",
-     net_result: "ผลกำไรสุทธิ",
-     hand_history: "ประวัติรายแฮนด์",
-     filter_all: "ทั้งหมด",
-     filter_won: "ชนะ",
-     filter_lost: "เสีย",
-     filter_folded: "หมอบ",
-     hide_folds: "ซ่อนแฮนด์หมอบ",
-     hand_short: "แฮนด์",
-     break_even: "เท่าทุน",
-     folded: "หมอบ",
-     no_hands_found: "ไม่พบข้อมูลแฮนด์",
-     no_hands_found_desc: "ลองปรับฟิลเตอร์เพื่อดูผลลัพธ์อื่น"
-   }
+    // Session Detail
+    back_to_dashboard: "กลับไปที่แดชบอร์ด",
+    poker_session: "เซสชั่นโป๊กเกอร์",
+    duration: "ระยะเวลา",
+    hour_short: " ชั่วโมง",
+    minute_short: " นาที",
+    biggest_win: "ชนะสูงสุด",
+    biggest_loss: "แพ้สูงสุด",
+    total_won: "รวมชนะ",
+    net_result: "ผลกำไรสุทธิ",
+    hand_history: "ประวัติรายแฮนด์",
+    filter_all: "ทั้งหมด",
+    filter_won: "ชนะ",
+    filter_lost: "เสีย",
+    filter_folded: "หมอบ",
+    hide_folds: "ซ่อนแฮนด์หมอบ",
+    hand_short: "แฮนด์",
+    break_even: "เท่าทุน",
+    folded: "หมอบ",
+    no_hands_found: "ไม่พบข้อมูลแฮนด์",
+    no_hands_found_desc: "ลองปรับฟิลเตอร์เพื่อดูผลลัพธ์อื่น"
+  }
 };

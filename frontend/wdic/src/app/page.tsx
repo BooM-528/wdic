@@ -65,9 +65,8 @@ export default function HomePage() {
             </div>
             <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
           </div>
-          <LanguageSwitcher />
         </div>
-        <div>
+        <div className="flex items-center gap-4">
           {loggedInUser ? (
             <div className="flex items-center gap-3">
               <span className="text-sm font-semibold text-gray-600">{loggedInUser}</span>
@@ -83,6 +82,7 @@ export default function HomePage() {
               {t("login")} <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
             </button>
           )}
+          <LanguageSwitcher />
         </div>
       </nav>
 

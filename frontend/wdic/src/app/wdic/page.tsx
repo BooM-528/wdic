@@ -91,11 +91,11 @@ export default function WdicSessionsPage() {
                   </div>
                   <span className="text-sm font-bold text-gray-500 group-hover:text-gray-900 transition-colors">{t("back")}</span>
               </Link>
-              <LanguageSwitcher />
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-6">
                 <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">W</div>
+                <LanguageSwitcher />
             </div>
         </div>
 

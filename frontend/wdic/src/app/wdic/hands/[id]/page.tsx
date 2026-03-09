@@ -467,11 +467,13 @@ export default function HandDetailPage() {
                   </div>
                   <span className="text-xs font-bold text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_session")}</span>
               </Link>
-              <LanguageSwitcher />
             </div>
-            <div className="flex flex-col items-end">
-                <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">{t("hand_no")} #{hand_no}</span>
-                <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{formatDate(started_at)}</span>
+            <div className="flex items-center gap-6">
+                <div className="flex flex-col items-end hidden sm:flex">
+                    <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">{t("hand_no")} #{hand_no}</span>
+                    <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{formatDate(started_at)}</span>
+                </div>
+                <LanguageSwitcher />
             </div>
         </div>
 
