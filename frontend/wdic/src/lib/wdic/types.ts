@@ -6,6 +6,7 @@ export type WdicSession = {
   ended_at: string | null;
   created_at: string;
   handCount: number;
+  analyzedCount: number;
 };
 
 export type WdicHandListItem = {

@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime  # ✅ เพิ่ม
 
 from django.db import IntegrityError, transaction
-from django.db.models import Min, Max, Count
+from django.db.models import Min, Max, Count, Q
 from django.http import Http404
 from django.utils.timezone import make_aware
 
@@ -41,6 +41,7 @@ class ImportSessionRequestSerializer(serializers.Serializer):
 
 class SessionListSerializer(serializers.ModelSerializer):
     handCount = serializers.IntegerField(read_only=True)
+    analyzedCount = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = WdicSession
@@ -52,6 +53,7 @@ class SessionListSerializer(serializers.ModelSerializer):
             "ended_at",
             "created_at",
             "handCount",
+            "analyzedCount",
         ]
 
 
@@ -357,7 +359,10 @@ class SessionListView(GuestRequiredAPIView):
         limit = int(request.query_params.get("limit", "50"))
         qs = (
             WdicSession.objects.filter(guest=guest)
-            .annotate(handCount=Count("hands"))
+            .annotate(
+                handCount=Count("hands"),
+                analyzedCount=Count("hands", filter=Q(hands__analysis__isnull=False)),
+            )
             .order_by("-created_at")[:limit]
         )
         return Response(SessionListSerializer(qs, many=True).data)
@@ -417,7 +422,10 @@ class SessionHandsView(GuestRequiredAPIView):
 
         session_with_count = (
             WdicSession.objects.filter(id=session.id, guest=guest)
-            .annotate(handCount=Count("hands"))
+            .annotate(
+                handCount=Count("hands"),
+                analyzedCount=Count("hands", filter=Q(hands__analysis__isnull=False)),
+            )
             .first()
         )
 
