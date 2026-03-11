@@ -20,12 +20,13 @@ export default function SharePage() {
         // 1. Create a canvas to draw the QR
         const canvas = document.createElement("canvas");
         const size = 1000; // High resolution
-        
+
         // 2. Generate QR with High Error Correction (to allow logo overlay)
         await QRCode.toCanvas(canvas, currentUrl, {
           width: size,
-          margin: 2,
+          margin: 4,
           errorCorrectionLevel: 'H',
+          version: 10, // High version for more detail (more dots)
           color: {
             dark: "#D9114A",
             light: "#ffffff",
@@ -46,13 +47,35 @@ export default function SharePage() {
           const x = (size - logoSize) / 2;
           const y = (size - logoSize) / 2;
 
-          // Draw white background for logo (Quiet zone)
+          // Calculate background size (Quiet zone)
+          const padding = size * 0.025; // 2.5% of total size
+          const bgSize = logoSize + padding * 2;
+          const bgX = (size - bgSize) / 2;
+          const bgY = (size - bgSize) / 2;
+          const borderRadius = size * 0.05; // 50px if size is 1000
+
+          // Save context for shadow and clipping
+          ctx.save();
+
+          // Draw Shadow for the logo container
+          ctx.shadowColor = "rgba(0, 0, 0, 0.15)";
+          ctx.shadowBlur = size * 0.04;
+          ctx.shadowOffsetY = size * 0.015;
+
+          // Draw white rounded rectangle background (Quiet zone)
           ctx.fillStyle = "#ffffff";
           ctx.beginPath();
-          ctx.roundRect(x - 10, y - 10, logoSize + 20, logoSize + 20, 40);
+          ctx.roundRect(bgX, bgY, bgSize, bgSize, borderRadius);
           ctx.fill();
 
-          // Draw the actual logo
+          // Add a very subtle border stroke for definition
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.05)";
+          ctx.lineWidth = size * 0.005;
+          ctx.stroke();
+
+          ctx.restore();
+
+          // Draw the actual logo centered on top
           ctx.drawImage(logo, x, y, logoSize, logoSize);
         }
 
@@ -88,28 +111,28 @@ export default function SharePage() {
 
           <div className="relative z-10">
             {/* Header */}
-            <h1 className="text-3xl md:text-5xl font-[1000] text-gray-900 mb-6 tracking-tighter leading-tight px-2">
-              {t("share_page_title")}
+            <h1 className="text-4xl md:text-6xl font-[1000] text-[#D9114A] mb-6 tracking-tighter leading-tight px-2">
+              WDIC
             </h1>
             <div className="h-1.5 w-12 md:w-16 bg-gradient-to-r from-[#D9114A] to-rose-400 rounded-full mx-auto mb-8 md:mb-10"></div>
-            
+
             <p className="text-sm md:text-lg text-gray-500 font-bold mb-8 md:mb-12 max-w-xs md:max-w-md mx-auto leading-relaxed opacity-80">
               {t("share_page_desc")}
             </p>
 
             {/* QR Code Container */}
-            <motion.div 
+            <motion.div
               whileHover={{ scale: 1.02 }}
               className="relative w-full aspect-square max-w-[280px] md:max-w-[320px] mx-auto bg-white p-4 md:p-6 rounded-[2.5rem] md:rounded-[3rem] shadow-[0_20px_60px_rgba(0,0,0,0.05)] border border-white flex items-center justify-center mb-10 md:mb-12 overflow-hidden group/qr"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-[#D9114A]/5 to-transparent opacity-0 group-hover/qr:opacity-100 transition-opacity duration-500"></div>
               {qrSrc ? (
-                <motion.img 
+                <motion.img
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  src={qrSrc} 
-                  alt="QR Code" 
-                  className="w-full h-full object-contain relative z-10" 
+                  src={qrSrc}
+                  alt="QR Code"
+                  className="w-full h-full object-contain relative z-10"
                 />
               ) : (
                 <div className="w-10 h-10 md:w-12 md:h-12 rounded-full border-4 border-rose-100 border-t-[#D9114A] animate-spin"></div>
@@ -123,7 +146,7 @@ export default function SharePage() {
                 <span className="text-lg md:text-xl font-bold text-gray-900 tracking-tight break-all px-2 md:px-4">
                   {url.replace(/^https?:\/\//, '')}
                 </span>
-                <button 
+                <button
                   onClick={handleCopyLink}
                   className="mt-2 flex items-center gap-2 px-8 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-black text-gray-600 hover:text-[#D9114A] hover:border-rose-200 transition-all shadow-sm active:scale-95"
                 >
@@ -135,8 +158,8 @@ export default function SharePage() {
                         animate={{ scale: 1 }}
                         className="flex items-center gap-2 text-green-500"
                       >
-                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
-                         Copied!
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+                        Copied!
                       </motion.div>
                     ) : (
                       <motion.div
@@ -145,8 +168,8 @@ export default function SharePage() {
                         animate={{ scale: 1 }}
                         className="flex items-center gap-2"
                       >
-                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
-                         Copy Link
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2" /><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" /></svg>
+                        Copy Link
                       </motion.div>
                     )}
                   </AnimatePresence>
