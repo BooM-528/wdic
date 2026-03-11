@@ -193,7 +193,7 @@ export default function WdicSessionsPage() {
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedSessionCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>}
-            subtext={user ? `${user.usage.session_count} / ${user.usage.session_limit} analyzed today${user.usage.extra_session_balance > 0 ? ` (+ ${user.usage.extra_session_balance} extra)` : ''}` : undefined}
+            subtext={user ? `${user.usage.session_count} / ${user.usage.session_limit} ${t("analyzed_today")}${user.usage.extra_session_balance > 0 ? ` (+ ${user.usage.extra_session_balance} ${t("extra")})` : ''}` : undefined}
             progress={user?.usage?.session_count}
             progressMax={user?.usage?.session_limit}
             user={user}
@@ -210,7 +210,7 @@ export default function WdicSessionsPage() {
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1-1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>}
-            subtext={user ? `${user.usage.hand_count} / ${user.usage.hand_limit} analyzed today${user.usage.extra_hand_balance > 0 ? ` (+ ${user.usage.extra_hand_balance} extra)` : ''}` : undefined}
+            subtext={user ? `${user.usage.hand_count} / ${user.usage.hand_limit} ${t("analyzed_today")}${user.usage.extra_hand_balance > 0 ? ` (+ ${user.usage.extra_hand_balance} ${t("extra")})` : ''}` : undefined}
             progress={user?.usage?.hand_count}
             progressMax={user?.usage?.hand_limit}
             user={user}
@@ -394,6 +394,7 @@ function SessionCard({ session, index }: { session: WdicSession; index: number }
 }
 
 function StatCard({ label, value, color, icon, subtext, user, progress, progressMax }: { label: string; value: string; color: string; icon: React.ReactNode; subtext?: string; user: any; progress?: number; progressMax?: number }) {
+  const { t } = useLanguage();
   const percent = progress !== undefined && progressMax !== undefined ? Math.min(100, (progress / Math.max(1, progressMax)) * 100) : 0;
   return (
     <motion.div
@@ -415,7 +416,7 @@ function StatCard({ label, value, color, icon, subtext, user, progress, progress
         {subtext && (
           <div className="mt-4 flex flex-col gap-2">
             <div className="flex justify-between items-center text-[8px] font-bold text-gray-400 uppercase tracking-widest">
-              <span>Daily Progress</span>
+              <span>{t("daily_progress")}</span>
               <span className="text-[#D9114A]">{Math.round(percent)}%</span>
             </div>
             <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden shadow-inner">

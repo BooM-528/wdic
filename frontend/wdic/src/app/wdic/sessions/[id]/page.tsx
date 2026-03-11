@@ -8,6 +8,7 @@ import ReactMarkdown from "react-markdown";
 import { getGuestId } from "@/lib/guest.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AiLanguageSwitcher from "@/components/AiLanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
 import { getUserInfo, isLoggedIn, logout, UserInfo, setUserInfo } from "@/lib/auth.client";
 import { apiFetch } from "@/lib/fetcher.client";
@@ -143,7 +144,7 @@ export default function WdicSessionDetailPage() {
   const [loading, setLoading] = useState(true);
 
   // Session Analysis State
-  const { language } = useLanguage();
+  const { language, aiLanguage } = useLanguage();
   const [sessionAnalysis, setSessionAnalysis] = useState<any>(null);
   const [analyzingSession, setAnalyzingSession] = useState(false);
   const [isAnalysisCollapsed, setIsAnalysisCollapsed] = useState(false);
@@ -217,7 +218,7 @@ export default function WdicSessionDetailPage() {
     if (!sessionId || analyzingSession) return;
     setAnalyzingSession(true);
     try {
-        const result = await analyzeSession(sessionId, force, language);
+        const result = await analyzeSession(sessionId, force, aiLanguage);
         setSessionAnalysis(result);
         refreshUser();
         await refreshUser(); // Refresh quota after analysis
@@ -417,14 +418,15 @@ export default function WdicSessionDetailPage() {
                           <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
                             {t("session_ai_insights")}
                           </h2>
-                          <div className="flex items-center gap-3">
+                          <div className="flex items-center gap-3 flex-wrap">
                             <p className="text-sm font-bold text-gray-400 uppercase tracking-widest leading-relaxed opacity-80">
                                 {t("session_ai_insights_desc")}
                             </p>
+                            <AiLanguageSwitcher />
                             {user && (
                                 <span className="text-[10px] font-black text-[#D9114A] bg-rose-50 px-3 py-1 rounded-xl border border-rose-100 uppercase tracking-widest">
                                     {user.usage.session_limit - user.usage.session_count} {t("remaining")}
-                                    {user.usage.extra_session_balance > 0 ? ` (+${user.usage.extra_session_balance} extra)` : ''}
+                                    {user.usage.extra_session_balance > 0 ? ` (+${user.usage.extra_session_balance} ${t("extra")})` : ''}
                                 </span>
                             )}
                           </div>

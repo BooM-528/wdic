@@ -1,8 +1,10 @@
 import os
 import json
+import re
 import logging
 from typing import Dict, Any, Optional
-import google.generativeai as genai
+from google import genai
+from google.genai import types
 from wdic.models import WdicHand, WdicSession
 
 logger = logging.getLogger(__name__)
@@ -14,7 +16,18 @@ class PokerAiService:
         self.model_name = "gemini-3-flash-preview"
 
         if self.api_key:
-            genai.configure(api_key=self.api_key)
+            self.client = genai.Client(api_key=self.api_key)
+        else:
+            self.client = None
+
+    def _parse_json_response(self, text: str) -> dict:
+        """Parse JSON from response text, stripping markdown fences if needed."""
+        try:
+            return json.loads(text)
+        except json.JSONDecodeError:
+            cleaned = re.sub(r'^```(?:json)?\s*', '', text.strip())
+            cleaned = re.sub(r'```\s*$', '', cleaned.strip())
+            return json.loads(cleaned)
 
     def analyze_hand(self, hand: WdicHand, lang: str = "th") -> Dict[str, Any]:
         """
@@ -30,15 +43,15 @@ class PokerAiService:
 
             prompt = self._build_prompt(hand, hand_data, raw_text, lang)
 
-            model = genai.GenerativeModel(
-                model_name=self.model_name,
-                generation_config={
-                    "response_mime_type": "application/json",
-                },
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
             )
 
-            response = model.generate_content(prompt)
-            result = json.loads(response.text)
+            result = self._parse_json_response(response.text)
 
             # Extract structured data with new technical metrics
             return {
@@ -50,6 +63,7 @@ class PokerAiService:
                 "tokens_used": (
                     response.usage_metadata.total_token_count
                     if hasattr(response, "usage_metadata")
+                    and response.usage_metadata
                     else 0
                 ),
             }
@@ -149,15 +163,15 @@ Review your defending ranges from the blinds against aggressive late-position op
         try:
             prompt = self._build_session_prompt(session, lang)
 
-            model = genai.GenerativeModel(
-                model_name=self.model_name,
-                generation_config={
-                    "response_mime_type": "application/json",
-                },
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                ),
             )
 
-            response = model.generate_content(prompt)
-            result = json.loads(response.text)
+            result = self._parse_json_response(response.text)
 
             return {
                 "content": result.get("analysis_markdown", "No analysis provided."),
@@ -165,6 +179,7 @@ Review your defending ranges from the blinds against aggressive late-position op
                 "tokens_used": (
                     response.usage_metadata.total_token_count
                     if hasattr(response, "usage_metadata")
+                    and response.usage_metadata
                     else 0
                 ),
             }
@@ -270,4 +285,3 @@ You played {session.hands.count()} hands in this session.
             "content": content.strip(),
             "model_name": f"{self.model_name} (mock)",
         }
-

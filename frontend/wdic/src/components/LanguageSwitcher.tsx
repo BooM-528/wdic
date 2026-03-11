@@ -28,7 +28,7 @@ export default function LanguageSwitcher() {
       {/* Sliding Pill */}
       <div
         className={`absolute top-1 bottom-1 w-[32px] rounded-[14px] shadow-sm z-10 flex items-center justify-center transition-all duration-300 pointer-events-none ${
-          isThai ? 'left-[36px] bg-[#D9114A] text-white ring-2 ring-[#D9114A]/20' : 'left-1 bg-gray-900 text-white ring-2 ring-gray-900/20'
+          isThai ? 'left-[36px] bg-[#D9114A] text-white ring-2 ring-[#D9114A]/20' : 'left-1 bg-indigo-600 text-white ring-2 ring-indigo-600/20'
         }`}
       >
         <span className="text-[10px] font-black leading-none tracking-widest">

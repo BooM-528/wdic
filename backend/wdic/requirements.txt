@@ -22,5 +22,5 @@ redis>=5.0,<6.0           # สำหรับ Celery broker / cache
 python-dotenv>=1.0,<2.0   # จัดการ .env
 gunicorn>=23.0,<24.0
 whitenoise>=6.0,<7.0           # serve static files (admin CSS/JS)
-google-generativeai>=0.8.0  # Gemini AI
+google-genai>=1.0.0  # Gemini AI (new unified SDK)
 requests>=2.31.0               # สำหรับเรียก LINE API

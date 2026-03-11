@@ -101,7 +101,15 @@ export const translations: Record<string, Record<string, string>> = {
     filter_status_all: "Status: All",
     filter_analyzed: "Analyzed",
     filter_unanalyzed: "Unanalyzed",
-    filter_recommended: "Recommended"
+    filter_recommended: "Recommended",
+    remaining: "remaining",
+    extra: "extra",
+    daily_progress: "Daily Progress",
+    setup_actions: "Setup Actions",
+    no_actions: "No actions (Checked through)",
+    no_board: "No Board",
+    analyzed_today: "analyzed today",
+    ai_language: "AI Language"
   },
   th: {
     // Navbar / Common
@@ -205,6 +213,14 @@ export const translations: Record<string, Record<string, string>> = {
     filter_status_all: "สถานะ: ทั้งหมด",
     filter_analyzed: "วิเคราะห์แล้ว",
     filter_unanalyzed: "ยังไม่วิเคราะห์",
-    filter_recommended: "แนะนำ"
+    filter_recommended: "แนะนำ",
+    remaining: "เหลือ",
+    extra: "เพิ่มเติม",
+    daily_progress: "โควตาประจาวัน",
+    setup_actions: "การเตรียมการ",
+    no_actions: "ไม่มีการเล่น (Checked through)",
+    no_board: "ไม่มีบอร์ด",
+    analyzed_today: "วิเคราะห์วันนี้",
+    ai_language: "ภาษา AI"
   }
 };

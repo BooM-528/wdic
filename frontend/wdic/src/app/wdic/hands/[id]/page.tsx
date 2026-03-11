@@ -7,6 +7,7 @@ import { getGuestId } from "@/lib/guest.client";
 import { getHandDetail, analyzeHand } from "@/lib/wdic/api.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import AiLanguageSwitcher from "@/components/AiLanguageSwitcher";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
 import { getUserInfo, isLoggedIn, logout, UserInfo, setUserInfo } from "@/lib/auth.client";
@@ -219,8 +220,9 @@ function CardBack({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 }
 
 function BoardDisplay({ cards, size = "md" }: { cards: string[], size?: "sm" | "md" | "lg" }) {
+    const { t } = useLanguage();
     const unique = getUniqueBoard(cards);
-    if (unique.length === 0) return <div className="text-gray-400 text-xs italic">No Board</div>;
+    if (unique.length === 0) return <div className="text-gray-400 text-xs italic">{t("no_board")}</div>;
     return (
         <div className="flex gap-1">
             {unique.map((c, i) => <Card key={i} card={c} size={size} />)}
@@ -412,7 +414,7 @@ function CombinedPlayerList({ roster, playerStats, bb, heroName }: any) {
 // --- 5. Main Page ---
 
 export default function HandDetailPage() {
-    const { t, language } = useLanguage();
+    const { t, language, aiLanguage } = useLanguage();
     const params = useParams<{ id: string }>();
     const [data, setData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -448,7 +450,7 @@ export default function HandDetailPage() {
         if (!data?.id || analyzing) return;
         setAnalyzing(true);
         try {
-            const result = await analyzeHand(data.id, force, language);
+            const result = await analyzeHand(data.id, force, aiLanguage);
             setData({ ...data, analysis: result });
             refreshUser();
         } catch (e) {
@@ -687,12 +689,13 @@ export default function HandDetailPage() {
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">{t("ai_insights")}</h2>
-                                        <div className="flex items-center gap-2">
+                                        <div className="flex items-center gap-3">
                                             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">{t("ai_insights_desc")}</p>
+                                            <AiLanguageSwitcher />
                                             {user && (
                                                 <span className="text-[9px] font-black text-[#D9114A] bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 uppercase tracking-tighter">
                                                     {user.usage.hand_limit - user.usage.hand_count} {t("remaining")} 
-                                                    {user.usage.extra_hand_balance > 0 ? ` (+${user.usage.extra_hand_balance} extra)` : ''}
+                                                    {user.usage.extra_hand_balance > 0 ? ` (+${user.usage.extra_hand_balance} ${t("extra")})` : ''}
                                                 </span>
                                             )}
                                         </div>
@@ -808,7 +811,7 @@ export default function HandDetailPage() {
                                 {/* Setup */}
                                 {sections.SETUP.length > 0 && (
                                     <div className="bg-gray-50/50 border-b border-white px-6 py-3 text-[10px] text-gray-400 flex flex-wrap gap-x-6 gap-y-2">
-                                        <span className="font-black uppercase tracking-[0.2em] text-gray-400">Setup Actions</span>
+                                        <span className="font-black uppercase tracking-[0.2em] text-gray-400">{t("setup_actions")}</span>
                                         {sections.SETUP.map((act: any, i: number) => (
                                             <span key={i} className="flex items-center gap-1.5 whitespace-nowrap">
                                                 <b className={`font-black uppercase ${act.actor === "Hero" ? "text-blue-500" : "text-gray-500"}`}>{act.actor === "Hero" ? "Hero" : roster.find((r: any) => r.name === act.actor)?.pos}</b>
@@ -876,9 +879,10 @@ function StreetHeader({ title, cards, color = "bg-white/40 border-white/50", tex
 }
 
 function ActionTable({ actions, bb, heroName, roster, heroLabel, isShowdown }: any) {
+    const { t } = useLanguage();
     if (!actions || actions.length === 0) {
         if (isShowdown) return null;
-        return <div className="px-6 py-4 text-xs italic text-gray-300 font-medium bg-white/30 text-center uppercase tracking-widest leading-loose">No actions (Checked through)</div>;
+        return <div className="px-6 py-4 text-xs italic text-gray-300 font-medium bg-white/30 text-center uppercase tracking-widest leading-loose">{t("no_actions")}</div>;
     }
 
     return (
