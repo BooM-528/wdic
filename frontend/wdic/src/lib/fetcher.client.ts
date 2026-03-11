@@ -1,4 +1,5 @@
 import { getGuestId } from './guest.client';
+import { getAccessToken } from './auth.client';
 
 const API_BASE = process.env.NEXT_PUBLIC_API_BASE_URL!;
 
@@ -16,6 +17,11 @@ export async function apiFetch<T>(
     'X-Guest-Id': getGuestId(),
     ...(customHeaders as Record<string, string> | undefined),
   };
+
+  const token = getAccessToken();
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
 
   // 👉 default เป็น JSON
   if (!skipJson) {

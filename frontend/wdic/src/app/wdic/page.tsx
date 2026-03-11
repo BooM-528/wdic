@@ -4,10 +4,12 @@ import React, { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { importSession, listSessions } from "@/lib/wdic/api.client";
+import { apiFetch } from "@/lib/fetcher.client";
 import { getGuestId } from "@/lib/guest.client";
 import type { WdicSession } from "@/lib/wdic/types";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import { getUserInfo, isLoggedIn, logout, UserInfo } from "@/lib/auth.client";
 
 // ✅ Source Options - updated styling for the light theme
 const SOURCE_OPTIONS = [
@@ -24,16 +26,33 @@ export default function WdicSessionsPage() {
 
   // ✅ Default is "n8" (Natural8)
   const [selectedSource, setSelectedSource] = useState("n8");
+  const [user, setUser] = useState<(UserInfo & { usage: any }) | null>(null);
 
-  const refresh = useCallback(async () => {
-    try {
-      getGuestId();
-      const data = await listSessions(50);
-      setSessions(data);
-    } catch (e) {
-      console.error("Failed to load sessions", e);
+  useEffect(() => {
+    if (isLoggedIn()) {
+      setUser(getUserInfo() as any);
     }
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/";
+  };
+
+    const refresh = useCallback(async () => {
+        try {
+            const me = await apiFetch<any>("/accounts/me");
+            setUser(me);
+        } catch (e) {
+            console.error("Failed to fetch user info", e);
+        }
+        try {
+            const data = await listSessions(50);
+            setSessions(data);
+        } catch (e) {
+            console.error("Failed to load sessions", e);
+        }
+    }, []);
 
   useEffect(() => {
     refresh();
@@ -100,6 +119,45 @@ export default function WdicSessionsPage() {
           </div>
 
           <div className="flex items-center gap-4">
+            {user && (
+              <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white shadow-sm ring-1 ring-black/5">
+                <div className="w-8 h-8 rounded-full bg-rose-100 overflow-hidden flex items-center justify-center border border-white shadow-inner">
+                  {user.avatar_url ? (
+                    <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-rose-500 font-black text-xs">{user.display_name[0]}</span>
+                  )}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tighter">{user.display_name}</span>
+                  <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">
+                    {user.tier} · {user.usage.hand_limit - user.usage.hand_count} left
+                  </span>
+                </div>
+                {isLoggedIn() ? (
+                  <button 
+                  onClick={handleLogout}
+                  className="ml-2 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
+                  title="Logout"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                </button>
+                ) : (
+                  <button 
+                    onClick={() => {
+                        const channelId = process.env.NEXT_PUBLIC_LINE_CHANNEL_ID;
+                        const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_LINE_REDIRECT_URI || '');
+                        const state = Math.random().toString(36).substring(7);
+                        window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${redirectUri}&state=${state}&scope=profile%20openid`;
+                    }}
+                    className="ml-2 p-1.5 text-rose-500 hover:text-rose-600 transition-colors"
+                    title="Login with LINE"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                  </button>
+                )}
+              </div>
+            )}
             <LanguageSwitcher />
           </div>
         </motion.div>
@@ -128,24 +186,34 @@ export default function WdicSessionsPage() {
             value={sessions.length.toString()}
             color="text-gray-900"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>}
+            user={user}
           />
           <StatCard
             label={t("stats_analyzed_sessions")}
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedSessionCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>}
+            subtext={user ? `${user.usage.session_count} / ${user.usage.session_limit} analyzed today${user.usage.extra_session_balance > 0 ? ` (+ ${user.usage.extra_session_balance} extra)` : ''}` : undefined}
+            progress={user?.usage?.session_count}
+            progressMax={user?.usage?.session_limit}
+            user={user}
           />
           <StatCard
             label={t("uploaded_hands")}
             value={sessions.reduce((acc: number, s: any) => acc + (s.handCount || 0), 0).toLocaleString()}
             color="text-gray-900"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>}
+            user={user}
           />
           <StatCard
             label={t("stats_analyzed_hands")}
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1-1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>}
+            subtext={user ? `${user.usage.hand_count} / ${user.usage.hand_limit} analyzed today${user.usage.extra_hand_balance > 0 ? ` (+ ${user.usage.extra_hand_balance} extra)` : ''}` : undefined}
+            progress={user?.usage?.hand_count}
+            progressMax={user?.usage?.hand_limit}
+            user={user}
           />
         </div>
 
@@ -325,7 +393,8 @@ function SessionCard({ session, index }: { session: WdicSession; index: number }
   );
 }
 
-function StatCard({ label, value, color, icon }: { label: string; value: string; color: string; icon: React.ReactNode }) {
+function StatCard({ label, value, color, icon, subtext, user, progress, progressMax }: { label: string; value: string; color: string; icon: React.ReactNode; subtext?: string; user: any; progress?: number; progressMax?: number }) {
+  const percent = progress !== undefined && progressMax !== undefined ? Math.min(100, (progress / Math.max(1, progressMax)) * 100) : 0;
   return (
     <motion.div
       whileHover={{ y: -8, scale: 1.02 }}
@@ -343,6 +412,24 @@ function StatCard({ label, value, color, icon }: { label: string; value: string;
           {label}
         </div>
         <div className={`text-4xl md:text-5xl font-[1000] tracking-tighter ${color} drop-shadow-sm leading-none`}>{value}</div>
+        {subtext && (
+          <div className="mt-4 flex flex-col gap-2">
+            <div className="flex justify-between items-center text-[8px] font-bold text-gray-400 uppercase tracking-widest">
+              <span>Daily Progress</span>
+              <span className="text-[#D9114A]">{Math.round(percent)}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+               <motion.div 
+                 initial={{ width: 0 }}
+                 animate={{ width: `${percent}%` }}
+                 className="h-full bg-gradient-to-r from-[#D9114A] to-rose-400"
+               />
+            </div>
+            <div className="text-[8px] font-medium text-gray-400">
+              {subtext}
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );

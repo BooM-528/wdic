@@ -3,18 +3,22 @@ from __future__ import annotations
 from typing import List, Optional
 from uuid import UUID
 import uuid
-from datetime import datetime  # ✅ เพิ่ม
+import datetime
+from datetime import datetime as dt_type  # To avoid conflict
 
 from django.db import IntegrityError, transaction
 from django.db.models import Min, Max, Count, Q
 from django.http import Http404
+from django.utils import timezone
 from django.utils.timezone import make_aware
 
 from rest_framework import serializers, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from accounts.views import IdentificationMixin
 
-from accounts.models import GuestIdentity
+from accounts.models import GuestIdentity, UserTier, AnalysisUsage, GuestLink
 from wdic.models import (
     WdicHand,
     WdicSession,
@@ -210,22 +214,99 @@ class HandDetailSerializer(serializers.ModelSerializer):
         return " ".join(cards) if cards else None
 
 
-# --- Base View ---
-class GuestRequiredAPIView(APIView):
+# --- Mixins ---
+
+
+
+class QuotaMixin:
+    """
+    Mixin to handle analysis quota based on user tiers.
+    """
+    def check_and_increment_quota(self, request, analysis_type="hand"):
+        today = datetime.date.today()
+        tier = None
+        user = None
+        guest = None
+
+        if request.user.is_authenticated:
+            user = request.user
+            profile = getattr(user, "profile", None)
+            
+            # 1. Determine Limits (Override > Tier)
+            if analysis_type == "hand":
+                limit = profile.max_hand_analyses_per_day_override if profile else None
+            else:
+                limit = profile.max_session_analyses_per_day_override if profile else None
+            
+            if limit is None:
+                tier = profile.tier if profile else None
+                if not tier:
+                    tier = UserTier.objects.filter(name__iexact="Free").first()
+                
+                if tier:
+                    limit = tier.max_hand_analyses_per_day if analysis_type == "hand" else tier.max_session_analyses_per_day
+                else:
+                    limit = 0 # No tier, no limit? Or allow? Let's say 0 for safety or provide a safe default.
+        else:
+            # 2. Guest Logic
+            guest = self.get_guest(request)
+            if not guest:
+                return False # Must have guest ID
+            
+            tier = UserTier.objects.filter(name__iexact="Guest").first()
+            if tier:
+                limit = tier.max_hand_analyses_per_day if analysis_type == "hand" else tier.max_session_analyses_per_day
+            else:
+                limit = 5 if analysis_type == "hand" else 1 # Fallback to user's request values
+
+        # 3. Check and Increment Usage
+        usage_filter = {"date": today}
+        if user:
+            usage_filter["user"] = user
+        else:
+            usage_filter["guest"] = guest
+
+        usage, _ = AnalysisUsage.objects.get_or_create(**usage_filter)
+
+        current_count = usage.hand_analyses_count if analysis_type == "hand" else usage.session_analyses_count
+        
+        if current_count >= limit:
+            # 4. Check Top-up Balance for Authenticated Users
+            if user:
+                profile = getattr(user, "profile", None)
+                if analysis_type == "hand" and profile and profile.extra_hand_analyses_balance > 0:
+                    profile.extra_hand_analyses_balance -= 1
+                    profile.save()
+                    # We don't increment daily usage because this is "extra"
+                    return True
+                elif analysis_type == "session" and profile and profile.extra_session_analyses_balance > 0:
+                    profile.extra_session_analyses_balance -= 1
+                    profile.save()
+                    return True
+            
+            return False
+
+        if analysis_type == "hand":
+            usage.hand_analyses_count += 1
+        else:
+            usage.session_analyses_count += 1
+        
+        usage.save()
+        return True
+
+
+class GuestRequiredAPIView(APIView, IdentificationMixin):
     def get_guest(self, request) -> GuestIdentity:
-        guest = getattr(request, "guest", None)
-        if guest:
-            return guest
-        guest_header = request.headers.get("X-Guest-Id")
-        if not guest_header:
-            raise serializers.ValidationError({"detail": "Missing X-Guest-Id"})
-        try:
-            guest_uuid = uuid.UUID(guest_header)
-        except ValueError:
-            raise serializers.ValidationError({"detail": "Invalid X-Guest-Id"})
-        guest, _ = GuestIdentity.objects.get_or_create(id=guest_uuid)
-        request.guest = guest
+        guest = super().get_guest(request)
+        if not guest:
+            # If it's a POST/important action, we might still want to enforce X-Guest-Id 
+            # if they aren't logged in.
+            raise serializers.ValidationError({"detail": "Missing or Invalid X-Guest-Id / Not Authenticated"})
         return guest
+
+    def get_permissions(self):
+        # Allow both JWT and Guest access
+        return [AllowAny()]
 
 
 # --- Views ---
@@ -297,7 +378,7 @@ class ImportSessionView(GuestRequiredAPIView):
                 started_at_dt = None
                 if meta.get("started_at_str"):
                     try:
-                        started_at_dt = datetime.strptime(
+                        started_at_dt = dt_type.strptime(
                             meta["started_at_str"], "%Y/%m/%d %H:%M:%S"
                         )
                     except ValueError:
@@ -449,18 +530,23 @@ class HandDetailView(GuestRequiredAPIView):
         return Response(HandDetailSerializer(hand).data)
 
 
-class AnalyzeHandView(GuestRequiredAPIView):
+class AnalyzeHandView(GuestRequiredAPIView, QuotaMixin):
     def post(self, request, hand_id: UUID):
         guest = self.get_guest(request)
-        hand = WdicHand.objects.filter(id=hand_id, guest=guest).first()
-        if not hand:
+        hand = WdicHand.objects.filter(id=hand_id).first()
+        if not hand or not self.validate_access(request, hand):
             raise Http404
 
-        # 1. Check if we should force re-analyze or if it's new
-        # For simplicity, we'll allow re-analysis on every POST to this endpoint
-        # or we could check for a 'force' param in the request
+        # 1. Check Quota
         force = request.data.get("force", False)
-        lang = request.data.get("lang", "th")
+        is_new_analysis = not hasattr(hand, "analysis") or force
+        
+        if is_new_analysis:
+            if not self.check_and_increment_quota(request, analysis_type="hand"):
+                return Response(
+                    {"detail": "Daily hand analysis quota exceeded."},
+                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                )
 
         if hasattr(hand, "analysis") and not force:
             return Response(HandAnalysisSerializer(hand.analysis).data)
@@ -468,6 +554,7 @@ class AnalyzeHandView(GuestRequiredAPIView):
         # 2. Trigger AI Analysis
         from wdic.ai_service import PokerAiService
 
+        lang = request.data.get("lang", "th")
         ai_service = PokerAiService()
         result = ai_service.analyze_hand(hand, lang=lang)
 
@@ -492,11 +579,11 @@ class AnalyzeHandView(GuestRequiredAPIView):
         )
 
 
-class AnalyzeSessionView(GuestRequiredAPIView):
+class AnalyzeSessionView(GuestRequiredAPIView, QuotaMixin):
     def get(self, request, session_id: UUID):
         guest = self.get_guest(request)
-        session = WdicSession.objects.filter(id=session_id, guest=guest).first()
-        if not session:
+        session = WdicSession.objects.filter(id=session_id).first()
+        if not session or not self.validate_access(request, session):
             raise Http404
         if hasattr(session, "analysis"):
             return Response(SessionAnalysisSerializer(session.analysis).data)
@@ -504,12 +591,20 @@ class AnalyzeSessionView(GuestRequiredAPIView):
 
     def post(self, request, session_id: UUID):
         guest = self.get_guest(request)
-        session = WdicSession.objects.filter(id=session_id, guest=guest).first()
-        if not session:
+        session = WdicSession.objects.filter(id=session_id).first()
+        if not session or not self.validate_access(request, session):
             raise Http404
 
         force = request.data.get("force", False)
         lang = request.data.get("lang", "th")
+        is_new_analysis = not hasattr(session, "analysis") or force
+
+        if is_new_analysis:
+            if not self.check_and_increment_quota(request, analysis_type="session"):
+                return Response(
+                    {"detail": "Daily session analysis quota exceeded."},
+                    status=status.HTTP_429_TOO_MANY_REQUESTS
+                )
 
         if hasattr(session, "analysis") and not force:
             return Response(SessionAnalysisSerializer(session.analysis).data)

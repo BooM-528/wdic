@@ -10,7 +10,13 @@ from .models import (
     FriendRequest,
     Group,
     GroupMember,
+    UserTier,
 )
+
+@admin.register(UserTier)
+class UserTierAdmin(admin.ModelAdmin):
+    list_display = ("name", "max_hand_analyses_per_day", "max_session_analyses_per_day")
+    list_editable = ("max_hand_analyses_per_day", "max_session_analyses_per_day")
 
 
 class UserProfileInline(admin.StackedInline):
@@ -18,7 +24,16 @@ class UserProfileInline(admin.StackedInline):
     fk_name = "user"
     can_delete = False
     extra = 0
-    fields = ("display_name", "line_social_id", "avatar_url")
+    fields = (
+        "display_name", 
+        "tier", 
+        "line_social_id", 
+        "avatar_url",
+        "max_hand_analyses_per_day_override",
+        "extra_hand_analyses_balance",
+        "max_session_analyses_per_day_override",
+        "extra_session_analyses_balance",
+    )
 
 
 class GuestLinkInline(admin.StackedInline):
@@ -41,7 +56,23 @@ admin.site.register(User, CustomUserAdmin)
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ("user", "display_name", "line_social_id")
+    list_display = (
+        "user", 
+        "display_name", 
+        "tier",
+        "max_hand_analyses_per_day_override",
+        "extra_hand_analyses_balance",
+        "max_session_analyses_per_day_override",
+        "extra_session_analyses_balance",
+    )
+    list_editable = (
+        "tier",
+        "max_hand_analyses_per_day_override",
+        "extra_hand_analyses_balance",
+        "max_session_analyses_per_day_override",
+        "extra_session_analyses_balance",
+    )
+    list_filter = ("tier",)
     search_fields = (
         "display_name",
         "line_social_id",

@@ -7,9 +7,20 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 
 
+class UserTier(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    max_hand_analyses_per_day = models.IntegerField(default=10)
+    max_session_analyses_per_day = models.IntegerField(default=1)
+
+    def __str__(self):
+        return self.name
+
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
-
+    tier = models.ForeignKey(
+        UserTier, on_delete=models.SET_NULL, null=True, related_name="profiles"
+    )
     display_name = models.CharField(max_length=100)
 
     line_social_id = models.CharField(
@@ -21,6 +32,20 @@ class UserProfile(models.Model):
     )
 
     avatar_url = models.URLField(blank=True)
+    
+    max_hand_analyses_per_day_override = models.IntegerField(
+        null=True, blank=True, help_text="Override daily hand limit for this user"
+    )
+    max_session_analyses_per_day_override = models.IntegerField(
+        null=True, blank=True, help_text="Override daily session limit for this user"
+    )
+
+    extra_hand_analyses_balance = models.IntegerField(
+        default=0, help_text="One-time top-up balance for hand analyses"
+    )
+    extra_session_analyses_balance = models.IntegerField(
+        default=0, help_text="One-time top-up balance for session analyses"
+    )
 
     def __str__(self):
         return f"Profile of {self.display_name}"
@@ -158,3 +183,26 @@ class GroupMember(models.Model):
     member_type = models.CharField(max_length=10, choices=MemberType.choices)
 
     joined_at = models.DateTimeField(auto_now_add=True)
+
+
+class AnalysisUsage(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="usage_logs", null=True, blank=True
+    )
+    guest = models.ForeignKey(
+        GuestIdentity,
+        on_delete=models.CASCADE,
+        related_name="usage_logs",
+        null=True,
+        blank=True,
+    )
+    date = models.DateField(auto_now_add=True)
+    hand_analyses_count = models.IntegerField(default=0)
+    session_analyses_count = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ("user", "date", "guest")
+
+    def __str__(self):
+        owner = self.user.username if self.user else f"Guest {self.guest_id}"
+        return f"Usage for {owner} on {self.date}"

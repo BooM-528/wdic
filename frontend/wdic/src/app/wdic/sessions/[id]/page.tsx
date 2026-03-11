@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getSessionHands, analyzeSession, getSessionAnalysis } from "@/lib/wdic/api.client";
@@ -9,6 +9,8 @@ import { getGuestId } from "@/lib/guest.client";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { motion, AnimatePresence } from "framer-motion";
+import { getUserInfo, isLoggedIn, logout, UserInfo, setUserInfo } from "@/lib/auth.client";
+import { apiFetch } from "@/lib/fetcher.client";
 
 // --- Types ---
 interface WdicHandData {
@@ -145,6 +147,31 @@ export default function WdicSessionDetailPage() {
   const [sessionAnalysis, setSessionAnalysis] = useState<any>(null);
   const [analyzingSession, setAnalyzingSession] = useState(false);
   const [isAnalysisCollapsed, setIsAnalysisCollapsed] = useState(false);
+  const [user, setUser] = useState<(UserInfo & { usage: any }) | null>(null);
+
+  const refreshUser = useCallback(async () => {
+    try {
+      const me = await apiFetch<any>("/accounts/me");
+      setUser(me);
+      if (isLoggedIn()) {
+        setUserInfo(me); // Sync to localStorage
+      }
+    } catch (e) {
+      console.error("Failed to refresh user", e);
+      if (isLoggedIn()) {
+        setUser(getUserInfo() as any);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    refreshUser();
+  }, [refreshUser]);
+
+  const handleLogout = () => {
+    logout();
+    window.location.href = "/";
+  };
 
   // Api Filter States
   const [apiPosition, setApiPosition] = useState<string>('');
@@ -192,6 +219,8 @@ export default function WdicSessionDetailPage() {
     try {
         const result = await analyzeSession(sessionId, force, language);
         setSessionAnalysis(result);
+        refreshUser();
+        await refreshUser(); // Refresh quota after analysis
     } catch (e) {
         console.error("Session AI Analysis failed", e);
     } finally {
@@ -313,6 +342,28 @@ export default function WdicSessionDetailPage() {
             </div>
 
             <div className="flex items-center gap-4">
+                {user && (
+                    <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white shadow-sm ring-1 ring-black/5">
+                        <div className="w-8 h-8 rounded-full bg-rose-100 overflow-hidden flex items-center justify-center border border-white shadow-inner">
+                            {user.avatar_url ? (
+                                <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+                            ) : (
+                                <span className="text-rose-500 font-black text-xs">{user.display_name[0]}</span>
+                            )}
+                        </div>
+                        <div className="flex flex-col">
+                            <span className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tighter">{user.display_name}</span>
+                            <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">{user.tier} · {user.usage.session_limit - user.usage.session_count} left</span>
+                        </div>
+                        <button 
+                            onClick={handleLogout}
+                            className="ml-2 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
+                            title="Logout"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                        </button>
+                    </div>
+                )}
                 <LanguageSwitcher />
             </div>
         </div>
@@ -366,9 +417,17 @@ export default function WdicSessionDetailPage() {
                           <h2 className="text-2xl font-black text-gray-900 tracking-tight mb-2">
                             {t("session_ai_insights")}
                           </h2>
-                          <p className="text-sm font-bold text-gray-400 uppercase tracking-widest leading-relaxed opacity-80">
-                            {t("session_ai_insights_desc")}
-                          </p>
+                          <div className="flex items-center gap-3">
+                            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest leading-relaxed opacity-80">
+                                {t("session_ai_insights_desc")}
+                            </p>
+                            {user && (
+                                <span className="text-[10px] font-black text-[#D9114A] bg-rose-50 px-3 py-1 rounded-xl border border-rose-100 uppercase tracking-widest">
+                                    {user.usage.session_limit - user.usage.session_count} {t("remaining")}
+                                    {user.usage.extra_session_balance > 0 ? ` (+${user.usage.extra_session_balance} extra)` : ''}
+                                </span>
+                            )}
+                          </div>
                         </div>
                     </div>
                     

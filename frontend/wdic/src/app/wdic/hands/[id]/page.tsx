@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { getGuestId } from "@/lib/guest.client";
@@ -9,6 +9,8 @@ import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ReactMarkdown from "react-markdown";
 import { motion, AnimatePresence } from "framer-motion";
+import { getUserInfo, isLoggedIn, logout, UserInfo, setUserInfo } from "@/lib/auth.client";
+import { apiFetch } from "@/lib/fetcher.client";
 
 // --- 1. Helper Functions ---
 
@@ -416,6 +418,31 @@ export default function HandDetailPage() {
     const [loading, setLoading] = useState(true);
     const [analyzing, setAnalyzing] = useState(false);
     const [isAnalysisCollapsed, setIsAnalysisCollapsed] = useState(false);
+    const [user, setUser] = useState<(UserInfo & { usage: any }) | null>(null);
+
+    const refreshUser = useCallback(async () => {
+        try {
+            const me = await apiFetch<any>("/accounts/me");
+            setUser(me);
+            if (isLoggedIn()) {
+                setUserInfo(me); // Only sync to localStorage if actually logged in
+            }
+        } catch (e) {
+            console.error("Failed to refresh user", e);
+            if (isLoggedIn()) {
+                setUser(getUserInfo() as any);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        refreshUser();
+    }, [refreshUser]);
+
+    const handleLogout = () => {
+        logout();
+        window.location.href = "/";
+    };
 
     const handleAnalyze = async (force = false) => {
         if (!data?.id || analyzing) return;
@@ -423,6 +450,7 @@ export default function HandDetailPage() {
         try {
             const result = await analyzeHand(data.id, force, language);
             setData({ ...data, analysis: result });
+            refreshUser();
         } catch (e) {
             console.error("AI Analysis failed", e);
         } finally {
@@ -554,10 +582,28 @@ export default function HandDetailPage() {
                     </div>
 
                     <div className="flex items-center gap-6">
-                        <div className="flex flex-col items-end hidden sm:flex">
-                            <span className="text-[10px] font-black text-[#D9114A] uppercase tracking-widest bg-rose-50/50 px-3 py-1 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">{t("hand_no")} #{hand_no}</span>
-                            <span className="text-[10px] font-bold text-gray-400 mt-1 uppercase tracking-tighter">{formatDate(started_at)}</span>
-                        </div>
+                        {user && (
+                            <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white shadow-sm ring-1 ring-black/5">
+                                <div className="w-8 h-8 rounded-full bg-rose-100 overflow-hidden flex items-center justify-center border border-white shadow-inner">
+                                    {user.avatar_url ? (
+                                        <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
+                                    ) : (
+                                        <span className="text-rose-500 font-black text-xs">{user.display_name[0]}</span>
+                                    )}
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tighter">{user.display_name}</span>
+                                    <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">{user.tier} · {user.usage.hand_limit - user.usage.hand_count} left</span>
+                                </div>
+                                <button 
+                                    onClick={handleLogout}
+                                    className="ml-2 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
+                                    title="Logout"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                                </button>
+                            </div>
+                        )}
                         <LanguageSwitcher />
                     </div>
                 </div>
@@ -565,18 +611,29 @@ export default function HandDetailPage() {
                 <div className="space-y-8">
 
                     {/* 1. Header Layout (Premium Glassmorphism) */}
-                    <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-8 md:p-10 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden group">
+                    <div className="bg-white/70 backdrop-blur-xl rounded-[2.5rem] p-6 md:p-12 border border-white shadow-[0_8px_30px_rgba(0,0,0,0.03)] relative overflow-hidden mb-8 group">
                         <div className="absolute -top-10 -right-10 w-40 h-40 bg-gradient-to-br from-rose-100 to-rose-50 rounded-full blur-3xl opacity-50 pointer-events-none group-hover:scale-110 transition-transform duration-700"></div>
 
-                        <div className="relative z-10 flex flex-col lg:flex-row justify-between items-center gap-10">
+                        <div className="relative z-10 flex flex-col justify-center">
+                            {/* Hand Info */}
+                            <div className="flex items-center gap-3 mb-8">
+                                <span className="text-[10px] text-[#D9114A] font-black uppercase tracking-widest bg-rose-50/50 px-3 py-1.5 rounded-xl border border-rose-100/50 shadow-sm backdrop-blur-sm">
+                                    {t("hand_no")} #{hand_no}
+                                </span>
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">
+                                    {formatDate(started_at)}
+                                </span>
+                            </div>
 
-                            {/* Left: Cards Group */}
-                            <div className="order-2 lg:order-1 flex flex-col md:flex-row items-center gap-8 md:gap-12">
-                                {/* Hero Hand */}
-                                <div className="text-center group/cards">
-                                    <div className="text-[10px] font-black text-blue-500 uppercase mb-3 tracking-[0.2em] flex items-center justify-center gap-2">
-                                        <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
-                                        {t("hero")} <PositionBadge pos={heroPos} />
+                            <div className="flex flex-col lg:flex-row justify-between items-center lg:items-end gap-10">
+
+                                {/* Left: Cards Group */}
+                                <div className="order-2 lg:order-1 flex flex-col md:flex-row items-center gap-8 md:gap-12">
+                                    {/* Hero Hand */}
+                                    <div className="text-center group/cards">
+                                        <div className="text-[10px] font-black text-blue-500 uppercase mb-3 tracking-[0.2em] flex items-center justify-center gap-2">
+                                            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></span>
+                                            {t("hero")} <PositionBadge pos={heroPos} />
                                     </div>
                                     <div className="flex gap-2 p-3 bg-blue-50/30 rounded-2xl border border-blue-100/50 backdrop-blur-sm group-hover/cards:scale-105 transition-transform">
                                         {hero_cards_str?.split(" ").map((c: string, i: number) => <Card key={i} card={c} size="lg" />)}
@@ -614,6 +671,7 @@ export default function HandDetailPage() {
 
                         </div>
                     </div>
+                        </div>
 
 
                     <div className="flex flex-col gap-8">
@@ -629,7 +687,15 @@ export default function HandDetailPage() {
                                     </div>
                                     <div>
                                         <h2 className="text-xl font-black text-gray-900 tracking-tight mb-1">{t("ai_insights")}</h2>
-                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">{t("ai_insights_desc")}</p>
+                                        <div className="flex items-center gap-2">
+                                            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest leading-relaxed">{t("ai_insights_desc")}</p>
+                                            {user && (
+                                                <span className="text-[9px] font-black text-[#D9114A] bg-rose-50 px-2 py-0.5 rounded-md border border-rose-100 uppercase tracking-tighter">
+                                                    {user.usage.hand_limit - user.usage.hand_count} {t("remaining")} 
+                                                    {user.usage.extra_hand_balance > 0 ? ` (+${user.usage.extra_hand_balance} extra)` : ''}
+                                                </span>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
 
