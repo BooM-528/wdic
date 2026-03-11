@@ -12,6 +12,13 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# NEXT_PUBLIC_* vars must be baked in at build time (not runtime)
+ARG NEXT_PUBLIC_API_BASE_URL
+ARG NEXT_PUBLIC_MEDIA_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=$NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_MEDIA_BASE_URL=$NEXT_PUBLIC_MEDIA_BASE_URL
+
 RUN pnpm build
 
 # ---------- runner ----------
