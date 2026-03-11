@@ -593,7 +593,7 @@ export default function HandDetailPage() {
                                 </div>
                                 <div className="flex flex-col">
                                     <span className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tighter">{user.display_name}</span>
-                                    <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">{user.tier} · {user.usage.hand_limit - user.usage.hand_count} left</span>
+                                    <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">{user.tier}</span>
                                 </div>
                                 <button 
                                     onClick={handleLogout}
