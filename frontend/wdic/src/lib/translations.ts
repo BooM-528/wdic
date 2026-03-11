@@ -3,7 +3,7 @@ export const translations: Record<string, Record<string, string>> = {
     // Navbar / Common
     brand_name: "WHY DID I CALL",
     dashboard: "Dashboard",
-    login: "Login",
+    login: "Login / Sign Up",
     back: "Back",
     back_to_session: "Back to Session",
     refresh: "Refresh",
@@ -18,6 +18,13 @@ export const translations: Record<string, Record<string, string>> = {
     hero_title_pro: "PRO",
     hero_subtitle: "Import Hand History from Natural8 or your favorite platforms to find leaks, improve Win-Rate, and become a sharper player.",
     start_free: "Start for Free",
+    login_desc: "Analyze your Hand History\nwith the power of AI",
+    continue_line: "Continue with LINE",
+    trial_guest: "Trial as Guest",
+    logout_title: "Log Out?",
+    logout_desc: "Confirm that you want to\nlog out now.",
+    logout_confirm: "Yes, Log Out",
+    cancel: "Cancel",
     view_demo: "View Demo Dashboard",
 
     features_title: "Core Features to Change Your Game",
@@ -109,13 +116,16 @@ export const translations: Record<string, Record<string, string>> = {
     no_actions: "No actions (Checked through)",
     no_board: "No Board",
     analyzed_today: "analyzed today",
-    ai_language: "AI Language"
+    ai_language: "AI Language",
+    share_page_title: "Share with Friends",
+    share_page_desc: "Scan this QR Code to visit our platform and start analyzing your poker hands.",
+    website_link: "Website Link"
   },
   th: {
     // Navbar / Common
     brand_name: "WHY DID I CALL",
     dashboard: "แดชบอร์ด",
-    login: "เข้าสู่ระบบ",
+    login: "เข้าสู่ระบบ / สมัครสมาชิก",
     back: "ย้อนกลับ",
     back_to_session: "กลับไปที่เซสชั่น",
     refresh: "รีเฟรช",
@@ -130,6 +140,13 @@ export const translations: Record<string, Record<string, string>> = {
     hero_title_pro: "มือโปร",
     hero_subtitle: "นำเข้า Hand History จาก Natural8 หรือแพลตฟอร์มโปรดของคุณ เพื่อค้นหาจุดอ่อน พัฒนา Win-Rate และเปลี่ยนคุณให้เป็นผู้เล่นที่เฉียบคมยิ่งขึ้น",
     start_free: "เริ่มใช้งานฟรี",
+    login_desc: "วิเคราะห์ Hand History\nของคุณด้วยพลัง AI",
+    continue_line: "เข้าใช้งานผ่าน LINE",
+    trial_guest: "ทดลองใช้งานในฐานะ Guest",
+    logout_title: "ออกจากระบบ?",
+    logout_desc: "ยืนยันว่าคุณต้องการ\nออกจากระบบในตอนนี้",
+    logout_confirm: "ยืนยัน ออกจากระบบ",
+    cancel: "ยกเลิก",
     view_demo: "ดูตัวอย่าง Dashboard",
 
     features_title: "ฟีเจอร์หลักที่จะเปลี่ยนวิธีการเล่นของคุณ",
@@ -221,6 +238,9 @@ export const translations: Record<string, Record<string, string>> = {
     no_actions: "ไม่มีการเล่น (Checked through)",
     no_board: "ไม่มีบอร์ด",
     analyzed_today: "วิเคราะห์วันนี้",
-    ai_language: "ภาษา AI"
+    ai_language: "ภาษา AI",
+    share_page_title: "แชร์ให้เพื่อนของคุณ",
+    share_page_desc: "สแกน QR Code นี้เพื่อเข้าใช้งานแพลตฟอร์ม และเริ่มวิเคราะห์แฮนด์โป๊กเกอร์ของคุณ",
+    website_link: "ลิงก์เว็บไซต์"
   }
 };

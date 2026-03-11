@@ -313,16 +313,8 @@ export default function WdicSessionDetailPage() {
   );
 
   return (
-    <div className="relative min-h-screen bg-[#F8F9FA] text-gray-800 font-sans selection:bg-[#D9114A]/20 pb-20 overflow-hidden">
-      
-      {/* 🌟 Dynamic Background Mesh Gradient Layer */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <div className="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-rose-200 animate-blob"></div>
-        <div className="fixed top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-blue-100 animate-blob animation-delay-2000"></div>
-        <div className="fixed bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
-      </div>
-
-      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-10">
+    <div className="flex-1 flex flex-col pt-24 md:pt-32">
+      <div className="relative z-10 max-w-7xl mx-auto p-4 md:p-10 w-full pt-0">
         
         {/* Navigation */}
         <div className="relative flex items-center justify-between mb-8 md:mb-12">
@@ -333,39 +325,6 @@ export default function WdicSessionDetailPage() {
                   </div>
                   <span className="text-sm font-black text-gray-500 group-hover:text-gray-900 transition-colors uppercase tracking-widest">{t("back_to_dashboard")}</span>
               </Link>
-            </div>
-
-            <div className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-                <div className="relative w-8 h-8 flex items-center justify-center">
-                  <img src="/logo.png" alt="WDIC Logo" className="w-full h-full object-contain" />
-                </div>
-                <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
-            </div>
-
-            <div className="flex items-center gap-4">
-                {user && (
-                    <div className="flex items-center gap-3 bg-white/50 backdrop-blur-md p-1.5 pr-4 rounded-full border border-white shadow-sm ring-1 ring-black/5">
-                        <div className="w-8 h-8 rounded-full bg-rose-100 overflow-hidden flex items-center justify-center border border-white shadow-inner">
-                            {user.avatar_url ? (
-                                <img src={user.avatar_url} alt={user.display_name} className="w-full h-full object-cover" />
-                            ) : (
-                                <span className="text-rose-500 font-black text-xs">{user.display_name[0]}</span>
-                            )}
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-[10px] font-black text-gray-900 leading-tight uppercase tracking-tighter">{user.display_name}</span>
-                            <span className="text-[8px] font-bold text-[#D9114A] leading-none uppercase tracking-[.2em]">{user.tier}</span>
-                        </div>
-                        <button 
-                            onClick={handleLogout}
-                            className="ml-2 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
-                            title="Logout"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                        </button>
-                    </div>
-                )}
-                <LanguageSwitcher />
             </div>
         </div>
 
@@ -718,7 +677,10 @@ export default function WdicSessionDetailPage() {
                             <div className="flex items-center gap-2">
                                 <PositionBadge pos={h.hero_position} />
                                 {h.has_analysis && (
-                                    <span className="text-[9px] font-black px-1.5 py-0.5 rounded bg-blue-100 text-blue-600 border border-blue-200">AI</span>
+                                    <div className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-100/80 text-blue-600 border border-blue-200 shadow-sm">
+                                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                                      <span className="text-[8px] font-black uppercase">AI</span>
+                                    </div>
                                 )}
                             </div>
                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wide whitespace-nowrap">
