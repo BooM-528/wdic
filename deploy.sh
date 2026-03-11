@@ -51,7 +51,7 @@ command -v docker compose >/dev/null 2>&1 || error "Docker Compose v2 is not ins
 [ -f "$COMPOSE_FILE" ] || error "docker-compose.yml not found"
 
 # Check required env vars
-source "$ENV_FILE"
+. "$ENV_FILE"
 [ -z "$SECRET_KEY" ] && error "SECRET_KEY is not set in .env"
 [ -z "$DB_PASSWORD" ] && error "DB_PASSWORD is not set in .env"
 [ -z "$NEXT_PUBLIC_API_BASE_URL" ] && error "NEXT_PUBLIC_API_BASE_URL is not set in .env"
