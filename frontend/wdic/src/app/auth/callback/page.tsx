@@ -11,6 +11,28 @@ function CallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  async function handleCallback(code: string) {
+    try {
+      const resp = await apiFetch<any>("/accounts/line-login", {
+        method: "POST",
+        body: JSON.stringify({
+          code,
+          guest_id: getGuestId(),
+          redirect_uri: process.env.NEXT_PUBLIC_LINE_REDIRECT_URI,
+        }),
+      });
+
+      if (resp.access && resp.refresh) {
+        setTokens(resp.access, resp.refresh);
+        setUserInfo(resp.user);
+        router.push("/wdic"); // Redirect to dashboard
+      }
+    } catch (err: any) {
+      console.error("Login failed:", err);
+      router.push("/?login_error=" + encodeURIComponent(err?.message || "login_failed"));
+    }
+  }
+
   useEffect(() => {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
@@ -36,28 +58,6 @@ function CallbackContent() {
       handleCallback(code);
     }
   }, [searchParams, router]);
-
-  async function handleCallback(code: string) {
-    try {
-      const resp = await apiFetch<any>("/accounts/line-login", {
-        method: "POST",
-        body: JSON.stringify({
-          code,
-          guest_id: getGuestId(),
-          redirect_uri: process.env.NEXT_PUBLIC_LINE_REDIRECT_URI,
-        }),
-      });
-
-      if (resp.access && resp.refresh) {
-        setTokens(resp.access, resp.refresh);
-        setUserInfo(resp.user);
-        router.push("/wdic"); // Redirect to dashboard
-      }
-    } catch (err: any) {
-      console.error("Login failed:", err);
-      router.push("/?login_error=" + encodeURIComponent(err?.message || "login_failed"));
-    }
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F9FA]">

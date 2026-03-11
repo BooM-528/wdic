@@ -116,8 +116,8 @@ export default function WdicSessionsPage() {
           <div className="flex items-center gap-6">
             {/* Removed the 'Back' button here */}
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition-all transform group-hover:-translate-y-0.5">
-                W
+              <div className="relative w-8 h-8 flex items-center justify-center">
+                <img src="/logo.png" alt="WDIC Logo" className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300" />
               </div>
               <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
             </Link>

@@ -577,8 +577,8 @@ export default function HandDetailPage() {
                     </div>
 
                     <div className="hidden md:flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
-                        <div className="w-8 h-8 bg-gradient-to-br from-[#D9114A] to-rose-400 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
-                            W
+                        <div className="relative w-8 h-8 flex items-center justify-center">
+                          <img src="/logo.png" alt="WDIC Logo" className="w-full h-full object-contain" />
                         </div>
                         <span className="text-xl font-black text-gray-900 tracking-tight">{t("brand_name")}</span>
                     </div>
