@@ -17,17 +17,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   && rm -rf /var/lib/apt/lists/*
 
 # ติดตั้ง Python dependencies ล่วงหน้า (ถ้ามี requirements.txt)
-# Copy requirements.txt and install dependencies
 COPY requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # Copy your Django project code
 COPY . .
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
-
-# Set the command to run the development server
-CMD gunicorn website.wsgi:application --bind 0.0.0.0:8000
+# Copy and prepare entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 8000
+
+# migrate + collectstatic + gunicorn ทำใน entrypoint (runtime ไม่ใช่ build time)
+ENTRYPOINT ["/entrypoint.sh"]
