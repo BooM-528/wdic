@@ -99,7 +99,7 @@ function HomeContent() {
       {/* Login Error Toast */}
       <AnimatePresence>
         {loginError && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, y: -20, x: "-50%" }}
@@ -107,17 +107,17 @@ function HomeContent() {
           >
             <div className="bg-white/80 backdrop-blur-2xl border border-red-100 p-4 rounded-3xl shadow-[0_20px_40px_rgba(220,38,38,0.1)] flex items-center gap-4">
               <div className="w-12 h-12 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></svg>
               </div>
               <div className="flex-1">
                 <h4 className="text-sm font-black text-gray-900 uppercase tracking-wider mb-0.5">Login Error</h4>
                 <p className="text-xs font-bold text-red-600/80 leading-snug">{loginError === 'state_mismatch' ? 'Security validation failed. Please try again.' : loginError}</p>
               </div>
-              <button 
-                onClick={() => setLoginError(null)} 
+              <button
+                onClick={() => setLoginError(null)}
                 className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
               </button>
             </div>
           </motion.div>
@@ -145,12 +145,12 @@ function HomeContent() {
                 <Link href="/wdic" className="px-5 py-2 rounded-full bg-gray-900 text-white text-sm font-bold shadow-sm hover:bg-gray-800 transition-colors">
                   {t("dashboard")}
                 </Link>
-                <button 
+                <button
                   onClick={handleLogoutClick}
                   className="p-2 text-gray-400 hover:text-rose-500 transition-colors"
                   title="Logout"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                 </button>
               </div>
             ) : (
@@ -167,102 +167,107 @@ function HomeContent() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-24 pb-20 text-center flex flex-col items-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-md border border-rose-100 text-[#D9114A] text-[10px] font-black uppercase tracking-[0.2em] mb-10 shadow-sm"
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
-          </span>
-          {t("hero_badge")}
-        </motion.div>
+      <section className="relative z-10 w-full max-w-7xl mx-auto px-6 pt-32 pb-24 lg:pt-48 lg:pb-32">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-8 items-center">
 
-        <motion.h1 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-6xl md:text-8xl font-black text-gray-900 tracking-tighter leading-[1.2] py-2 mb-8 max-w-5xl"
-        >
-          {t("hero_title_part1")}<br /> 
-          <span className="relative">
-            {t("hero_title_part2Base")}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#D9114A] via-rose-500 to-rose-400">
-              {t("hero_title_pro")}
-            </span>
-            <div className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-[#D9114A]/20 to-transparent rounded-full blur-sm"></div>
-          </span>
-        </motion.h1>
-
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-xl md:text-2xl text-gray-500 font-medium max-w-3xl mb-14 leading-relaxed"
-        >
-          {t("hero_subtitle")}
-        </motion.p>
-
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center gap-5 w-full sm:w-auto"
-        >
-          {user ? (
-            <Link href="/wdic" className="group relative w-full sm:w-auto overflow-hidden px-12 py-5 rounded-2xl bg-gray-900 text-white font-black text-xl shadow-2xl hover:bg-gray-800 transition-all flex items-center justify-center gap-3">
-              <span className="relative z-10 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
-                {t("dashboard")}
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full duration-1000 transition-transform"></div>
-            </Link>
-          ) : (
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="group relative w-full sm:w-auto overflow-hidden px-12 py-5 rounded-2xl bg-[#D9114A] text-white font-black text-xl shadow-[0_15px_35px_rgba(217,17,74,0.3)] hover:shadow-[0_20px_45px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"
+          {/* Left Column: Value Proposition */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6 }}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/50 backdrop-blur-md border border-rose-100 text-[#D9114A] text-[10px] font-black uppercase tracking-[0.2em] mb-8 shadow-sm"
             >
-              <span className="relative z-10 flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
-                {t("start_free")}
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full duration-700 transition-transform"></div>
-            </button>
-          )}
-        </motion.div>
+              {t("hero_badge")}
+            </motion.div>
 
-        {/* 🌈 Large Floating Logo - Clean & Bolder Branding */}
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2, delay: 0.5, ease: "easeOut" }}
-          className="relative mt-32 w-full max-w-2xl flex items-center justify-center"
-        >
-          {/* Intense Background Glow for Depth */}
-          <div className="absolute inset-0 bg-gradient-to-tr from-[#D9114A]/40 via-rose-500/20 to-indigo-500/40 rounded-full blur-[120px] opacity-40"></div>
-          
+            <motion.h1
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-3xl md:text-5xl lg:text-5xl font-black text-gray-900 tracking-tight leading-[1.6] mb-8 overflow-visible"
+            >
+              {t("hero_title_part1")}<br />
+              {t("hero_title_part2Base")}<br />
+              <span className="relative inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-br from-[#D9114A] via-rose-500 to-rose-400">
+                  {t("hero_title_pro")}
+                </span>
+                <div className="absolute -bottom-2 left-0 w-full h-2 bg-[#D9114A]/10 rounded-full blur-md"></div>
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="text-lg md:text-xl text-gray-500 font-medium max-w-xl mb-12 leading-relaxed"
+            >
+              {t("hero_subtitle")}
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="flex flex-col sm:flex-row items-center gap-5 w-full sm:w-auto"
+            >
+              {user ? (
+                <Link href="/wdic" className="group relative w-full sm:w-auto overflow-hidden px-10 py-5 rounded-2xl bg-gray-900 text-white font-black text-lg shadow-2xl hover:bg-gray-800 transition-all flex items-center justify-center gap-3">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
+                  {t("dashboard")}
+                </Link>
+              ) : (
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="group relative w-full sm:w-auto overflow-hidden px-12 py-5 rounded-2xl bg-[#D9114A] text-white font-black text-xl shadow-[0_20px_40px_rgba(217,17,74,0.3)] hover:shadow-[0_25px_50px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"
+                >
+                  {t("start_free")}
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
+                </button>
+              )}
+            </motion.div>
+          </div>
+
+          {/* Right Column: Visual Stage */}
           <motion.div
-            animate={{ 
-              y: [0, -20, 0],
-              rotate: [0, 2, 0, -2, 0]
-            }}
-            transition={{
-              duration: 8,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-            className="relative z-10"
+            initial={{ opacity: 0, scale: 0.9, x: 20 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="relative flex items-center justify-center lg:justify-end"
           >
-            <img 
-              src="/logo.png" 
-              alt="WDIC Final Logo" 
-              className="w-80 h-80 md:w-[480px] md:h-[480px] object-contain drop-shadow-[0_40px_80px_rgba(217,17,74,0.4)] hover:scale-105 transition-transform duration-1000"
-            />
+            {/* Visual Stage Container */}
+            <div className="relative w-full aspect-square max-w-[540px] flex items-center justify-center">
+              {/* Animated Background Elements */}
+              <div className="absolute inset-0 bg-gradient-to-tr from-[#D9114A]/10 via-rose-500/5 to-indigo-500/10 rounded-[4rem] blur-3xl opacity-50"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] opacity-[0.03] bg-[radial-gradient(#D9114A_1.5px,transparent_1.5px)] [background-size:40px_40px]"></div>
+
+              <motion.div
+                animate={{
+                  y: [0, -25, 0],
+                  rotate: [0, 1, 0, -1, 0]
+                }}
+                transition={{
+                  duration: 8,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+                className="relative z-10 w-full h-full flex items-center justify-center"
+              >
+                {/* Logo with sophisticated shadow */}
+                <img
+                  src="/logo.png"
+                  alt="WDIC Premium Logo"
+                  className="w-[85%] h-[85%] object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.12)] drop-shadow-[0_60px_100px_rgba(217,17,74,0.15)]"
+                />
+              </motion.div>
+            </div>
           </motion.div>
-        </motion.div>
+        </div>
       </section>
 
       {/* Features Grid */}
@@ -275,7 +280,7 @@ function HomeContent() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
           <FeatureCard
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></svg>
             }
             title={t("feature1_title")}
             desc={t("feature1_desc")}
@@ -284,7 +289,7 @@ function HomeContent() {
           />
           <FeatureCard
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
             }
             title={t("feature2_title")}
             desc={t("feature2_desc")}
@@ -293,7 +298,7 @@ function HomeContent() {
           />
           <FeatureCard
             icon={
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8" /><line x1="21" y1="21" x2="16.65" y2="16.65" /></svg>
             }
             title={t("feature3_title")}
             desc={t("feature3_desc")}
@@ -312,7 +317,7 @@ function HomeContent() {
 
           <div className="relative z-10 text-center">
             <h2 className="text-4xl md:text-5xl font-black text-white mb-20 tracking-tight">{t("how_it_works")}</h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-16 relative">
               <StepItem num="1" title={t("step1_title")} desc={t("step1_desc")} />
               <StepItem num="2" title={t("step2_title")} desc={t("step2_desc")} />
@@ -330,7 +335,7 @@ function HomeContent() {
                   onClick={() => setIsModalOpen(true)}
                   className="inline-flex px-12 py-5 rounded-2xl bg-[#D9114A] text-white font-black text-xl shadow-2xl shadow-rose-900/20 hover:bg-rose-600 hover:scale-105 active:scale-100 transition-all items-center justify-center gap-3"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" /><polyline points="10 17 15 12 10 7" /><line x1="15" y1="12" x2="3" y2="12" /></svg>
                   {t("start_free")}
                 </button>
               )}
@@ -388,14 +393,14 @@ function HomeContent() {
                 </div>
 
                 <h3 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">เข้าสู่ระบบ</h3>
-                <p className="text-gray-500 font-bold mb-10 text-center leading-relaxed">วิเคราะห์ Hand History<br/>ของคุณด้วยพลัง AI</p>
+                <p className="text-gray-500 font-bold mb-10 text-center leading-relaxed">วิเคราะห์ Hand History<br />ของคุณด้วยพลัง AI</p>
 
                 <div className="flex flex-col gap-4 w-full">
                   <button
                     onClick={handleLogin}
                     className="group relative w-full py-4 rounded-2xl bg-[#06C755] text-white font-black text-lg shadow-[0_10px_30px_rgba(6,199,85,0.2)] hover:bg-[#05b34c] hover:shadow-[0_15px_40px_rgba(6,199,85,0.3)] transition-all active:scale-[0.98] flex items-center justify-center gap-3"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" /></svg>
                     Continue with LINE
                   </button>
 
@@ -432,11 +437,11 @@ function HomeContent() {
 
               <div className="relative z-10 flex flex-col items-center">
                 <div className="w-20 h-20 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mb-8 shadow-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>
                 </div>
 
                 <h3 className="text-3xl font-black text-gray-900 mb-3 tracking-tight">ออกจากระบบ?</h3>
-                <p className="text-gray-500 font-bold mb-10 leading-relaxed">ยืนยันว่าคุณต้องการ<br/>ออกจากระบบในตอนนี้</p>
+                <p className="text-gray-500 font-bold mb-10 leading-relaxed">ยืนยันว่าคุณต้องการ<br />ออกจากระบบในตอนนี้</p>
 
                 <div className="flex flex-col gap-4 w-full">
                   <button
@@ -467,7 +472,7 @@ function HomeContent() {
 
 function FeatureCard({ icon, title, desc, color, delay }: { icon: React.ReactNode; title: string; desc: string; color: string; delay: number }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
