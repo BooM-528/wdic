@@ -27,6 +27,7 @@ export default function WdicSessionsPage() {
   // ✅ Default is "n8" (Natural8)
   const [selectedSource, setSelectedSource] = useState("n8");
   const [user, setUser] = useState<(UserInfo & { usage: any }) | null>(null);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn()) {
@@ -34,7 +35,11 @@ export default function WdicSessionsPage() {
     }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogoutClick = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const handleLogoutConfirm = () => {
     logout();
     window.location.href = "/";
   };
@@ -136,7 +141,7 @@ export default function WdicSessionsPage() {
                 </div>
                 {isLoggedIn() ? (
                   <button 
-                  onClick={handleLogout}
+                  onClick={handleLogoutClick}
                   className="ml-2 p-1.5 text-gray-300 hover:text-rose-500 transition-colors"
                   title="Logout"
                 >
@@ -148,7 +153,7 @@ export default function WdicSessionsPage() {
                         const channelId = process.env.NEXT_PUBLIC_LINE_CHANNEL_ID;
                         const redirectUri = encodeURIComponent(process.env.NEXT_PUBLIC_LINE_REDIRECT_URI || '');
                         const state = Math.random().toString(36).substring(7);
-                        window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${redirectUri}&state=${state}&scope=profile%20openid`;
+                        window.location.href = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${redirectUri}&state=${state}&scope=profile%20openid&bot_prompt=aggressive`;
                     }}
                     className="ml-2 p-1.5 text-rose-500 hover:text-rose-600 transition-colors"
                     title="Login with LINE"
@@ -193,7 +198,7 @@ export default function WdicSessionsPage() {
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedSessionCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/><path d="m9 13 2 2 4-4"/></svg>}
-            subtext={user ? `${user.usage.session_count} / ${user.usage.session_limit} ${t("analyzed_today")}${user.usage.extra_session_balance > 0 ? ` (+ ${user.usage.extra_session_balance} ${t("extra")})` : ''}` : undefined}
+            subtext={user?.usage ? `${user.usage.session_count} / ${user.usage.session_limit} ${t("analyzed_today")}${user.usage.extra_session_balance > 0 ? ` (+ ${user.usage.extra_session_balance} ${t("extra")})` : ''}` : undefined}
             progress={user?.usage?.session_count}
             progressMax={user?.usage?.session_limit}
             user={user}
@@ -210,7 +215,7 @@ export default function WdicSessionsPage() {
             value={sessions.reduce((acc: number, s: any) => acc + (s.analyzedCount || 0), 0).toLocaleString()}
             color="bg-gradient-to-r from-[#D9114A] to-rose-400 bg-clip-text text-transparent"
             icon={<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1-1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3z"/></svg>}
-            subtext={user ? `${user.usage.hand_count} / ${user.usage.hand_limit} ${t("analyzed_today")}${user.usage.extra_hand_balance > 0 ? ` (+ ${user.usage.extra_hand_balance} ${t("extra")})` : ''}` : undefined}
+            subtext={user?.usage ? `${user.usage.hand_count} / ${user.usage.hand_limit} ${t("analyzed_today")}${user.usage.extra_hand_balance > 0 ? ` (+ ${user.usage.extra_hand_balance} ${t("extra")})` : ''}` : undefined}
             progress={user?.usage?.hand_count}
             progressMax={user?.usage?.hand_limit}
             user={user}
@@ -311,6 +316,40 @@ export default function WdicSessionsPage() {
           </AnimatePresence>
         </motion.div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {isLogoutModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm px-4 transition-opacity duration-300"
+        >
+          <div
+            className="relative bg-white/95 backdrop-blur-2xl border border-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl transform transition-all duration-300 animate-in zoom-in-95 text-center"
+          >
+            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+
+            <h3 className="text-2xl font-black text-gray-900 mb-2">{t("logout") || "Log Out?"}</h3>
+            <p className="text-gray-500 font-medium mb-8">Are you sure you want to log out?</p>
+
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={handleLogoutConfirm}
+                className="w-full py-3.5 rounded-xl bg-[#D9114A] text-white font-bold hover:bg-rose-600 transition-all shadow-lg active:scale-[0.98]"
+              >
+                Yes, Log Out
+              </button>
+
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-all active:scale-[0.98]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

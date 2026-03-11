@@ -23,7 +23,7 @@ class IdentificationMixin:
     def get_guest(self, request) -> Optional[GuestIdentity]:
         # 1. If user is logged in, try to find linked guest
         if request.user.is_authenticated:
-            link = GuestLink.objects.filter(user=request.user).first()
+            link = GuestLink.objects.filter(user=request.user).order_by('-linked_at').first()
             if link:
                 return link.guest
 

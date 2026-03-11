@@ -14,12 +14,23 @@ function CallbackContent() {
   useEffect(() => {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
+    const returnedState = searchParams.get("state");
 
     if (error) {
       console.error("LINE Login Error:", error);
-      router.push("/?login_error=" + error);
+      router.push("/?login_error=" + encodeURIComponent(error));
       return;
     }
+
+    // Validate state to prevent CSRF attacks
+    const savedState = localStorage.getItem("line_login_state");
+    if (savedState && returnedState !== savedState) {
+      console.error("State mismatch — possible CSRF attack");
+      router.push("/?login_error=state_mismatch");
+      return;
+    }
+    // Clean up stored state
+    localStorage.removeItem("line_login_state");
 
     if (code) {
       handleCallback(code);
@@ -42,9 +53,9 @@ function CallbackContent() {
         setUserInfo(resp.user);
         router.push("/wdic"); // Redirect to dashboard
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Login failed:", err);
-      router.push("/?login_failed=true");
+      router.push("/?login_error=" + encodeURIComponent(err?.message || "login_failed"));
     }
   }
 

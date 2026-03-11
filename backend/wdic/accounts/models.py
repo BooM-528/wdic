@@ -75,15 +75,18 @@ class GuestIdentity(models.Model):
 
 
 class GuestLink(models.Model):
-    guest = models.OneToOneField(
-        GuestIdentity, on_delete=models.CASCADE, related_name="link"
+    guest = models.ForeignKey(
+        GuestIdentity, on_delete=models.CASCADE, related_name="links"
     )
 
-    user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="guest_link"
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="guest_links"
     )
 
     linked_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("guest", "user")
 
     def __str__(self):
         return f"Guest {self.guest_id} → User {self.user_id}"

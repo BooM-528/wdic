@@ -2,21 +2,33 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from 'next/link';
+import { useSearchParams } from "next/navigation";
 import { useLanguage } from "@/lib/LanguageContext";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import { redirectToLineLogin, getUserInfo, isLoggedIn, logout, UserInfo } from "@/lib/auth.client";
+import { Suspense } from "react";
 
-export default function HomePage() {
+function HomeContent() {
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isLoggedIn()) {
       setUser(getUserInfo());
     }
-  }, []);
+    const errorParam = searchParams.get("login_error");
+    if (errorParam) {
+      setLoginError(errorParam);
+      // Auto-dismiss after 8 seconds
+      const timer = setTimeout(() => setLoginError(null), 8000);
+      return () => clearTimeout(timer);
+    }
+  }, [searchParams]);
 
   // Close modal on outside click or Escape key
   useEffect(() => {
@@ -47,7 +59,11 @@ export default function HomePage() {
     redirectToLineLogin();
   }
 
-  function handleLogout() {
+  function handleLogoutClick() {
+    setIsLogoutModalOpen(true);
+  }
+
+  function handleLogoutConfirm() {
     logout();
     window.location.reload();
   }
@@ -66,6 +82,19 @@ export default function HomePage() {
         <div className="fixed top-[20%] right-[-10%] w-[60%] h-[60%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-blue-100 animate-blob animation-delay-2000"></div>
         <div className="fixed bottom-[-20%] left-[20%] w-[50%] h-[50%] rounded-full mix-blend-multiply filter blur-[120px] opacity-40 bg-indigo-100 animate-blob animation-delay-4000"></div>
       </div>
+
+      {/* Login Error Toast */}
+      {loginError && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-in slide-in-from-top fade-in duration-300">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-3 rounded-2xl shadow-lg flex items-center gap-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            <span className="text-sm font-bold">Login failed: {loginError === 'state_mismatch' ? 'Security validation failed' : loginError}</span>
+            <button onClick={() => setLoginError(null)} className="text-red-400 hover:text-red-600 ml-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Navbar Container */}
       <nav className="relative z-20 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
@@ -88,7 +117,7 @@ export default function HomePage() {
                 {t("dashboard")}
               </Link>
               <button 
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 className="p-2 text-gray-400 hover:text-rose-500 transition-colors"
                 title="Logout"
               >
@@ -122,16 +151,20 @@ export default function HomePage() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-          <Link href="/wdic" className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-[#D9114A] text-white font-black text-lg shadow-[0_8px_25px_rgba(217,17,74,0.3)] hover:shadow-[0_12px_35px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
-            {t("start_free")}
-          </Link>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white border border-gray-200 text-gray-700 font-black text-lg shadow-[0_4px_15px_rgba(0,0,0,0.03)] hover:bg-gray-50 hover:-translate-y-1 transition-all"
-          >
-            {t("view_demo")}
-          </button>
+          {user ? (
+            <Link href="/wdic" className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-[#D9114A] text-white font-black text-lg shadow-[0_8px_25px_rgba(217,17,74,0.3)] hover:shadow-[0_12px_35px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
+              {t("dashboard")}
+            </Link>
+          ) : (
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="w-full sm:w-auto px-10 py-4 rounded-2xl bg-[#D9114A] text-white font-black text-lg shadow-[0_8px_25px_rgba(217,17,74,0.3)] hover:shadow-[0_12px_35px_rgba(217,17,74,0.4)] hover:-translate-y-1 active:translate-y-0 transition-all flex items-center justify-center gap-3"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+              {t("start_free")}
+            </button>
+          )}
         </div>
       </section>
 
@@ -178,9 +211,20 @@ export default function HomePage() {
           </div>
 
           <div className="mt-16">
-            <Link href="/wdic" className="inline-flex px-8 py-4 rounded-2xl bg-gray-900 text-white font-black text-lg shadow-xl hover:bg-gray-800 hover:scale-105 transition-all">
-              {t("dashboard")}
-            </Link>
+            {user ? (
+              <Link href="/wdic" className="inline-flex px-10 py-4 rounded-2xl bg-gray-900 text-white font-black text-lg shadow-xl hover:bg-gray-800 hover:scale-105 transition-all gap-3 items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M3 3v18h18" /><path d="m19 9-5 5-4-4-3 3" /></svg>
+                {t("dashboard")}
+              </Link>
+            ) : (
+              <button
+                onClick={() => setIsModalOpen(true)}
+                className="inline-flex px-10 py-4 rounded-2xl bg-[#D9114A] text-white font-black text-lg shadow-[0_8px_25px_rgba(217,17,74,0.3)] hover:shadow-[0_12px_35px_rgba(217,17,74,0.4)] hover:scale-105 hover:-translate-y-1 active:translate-y-0 transition-all items-center justify-center gap-3"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                {t("start_free")}
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -245,6 +289,40 @@ export default function HomePage() {
         </div>
       )}
 
+      {/* Logout Confirmation Modal */}
+      {isLogoutModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-gray-900/40 backdrop-blur-sm px-4 transition-opacity duration-300"
+        >
+          <div
+            className="relative bg-white/95 backdrop-blur-2xl border border-white rounded-[2rem] w-full max-w-sm p-8 shadow-2xl transform transition-all duration-300 animate-in zoom-in-95 text-center"
+          >
+            <div className="w-16 h-16 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center mb-6 mx-auto">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </div>
+
+            <h3 className="text-2xl font-black text-gray-900 mb-2">Log Out?</h3>
+            <p className="text-gray-500 font-medium mb-8">Are you sure you want to log out?</p>
+
+            <div className="flex flex-col gap-3 w-full">
+              <button
+                onClick={handleLogoutConfirm}
+                className="w-full py-3.5 rounded-xl bg-[#D9114A] text-white font-bold hover:bg-rose-600 transition-all shadow-lg active:scale-[0.98]"
+              >
+                Yes, Log Out
+              </button>
+
+              <button
+                onClick={() => setIsLogoutModalOpen(false)}
+                className="w-full py-3.5 rounded-xl bg-gray-100 text-gray-700 font-bold hover:bg-gray-200 transition-all active:scale-[0.98]"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </main>
   );
 }
@@ -272,5 +350,13 @@ function StepItem({ num, title, desc }: { num: string; title: string; desc: stri
       <h4 className="text-lg font-black text-gray-900 mb-2">{title}</h4>
       <p className="text-gray-500 font-medium text-sm px-4">{desc}</p>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#F8F9FA]" />}>
+      <HomeContent />
+    </Suspense>
   );
 }

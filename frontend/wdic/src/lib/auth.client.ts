@@ -60,7 +60,7 @@ export function redirectToLineLogin() {
   // Store state for security validation if needed
   localStorage.setItem('line_login_state', state);
 
-  const url = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${redirectUri}&state=${state}&scope=profile%20openid`;
+  const url = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${channelId}&redirect_uri=${redirectUri}&state=${state}&scope=profile%20openid&bot_prompt=aggressive`;
   
   window.location.href = url;
 }
